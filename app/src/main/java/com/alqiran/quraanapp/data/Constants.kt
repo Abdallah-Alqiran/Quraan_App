@@ -7,4 +7,5 @@ object Constants {
     const val MOSHAF = "moshaf"
     const val RECENT_READS = "recent_reads"
     const val RADIOS = "radios"
+    const val RECITERS = "reciters"
 }

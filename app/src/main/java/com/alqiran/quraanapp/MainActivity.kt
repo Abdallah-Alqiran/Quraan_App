@@ -38,6 +38,7 @@ class MainActivity : ComponentActivity() {
                     Log.d("Al-qiran moshaf", repository.getAllMoshaf().toString())
                     Log.d("Al-qiran recentReads", repository.getAllRecentReads().toString())
                     Log.d("Al-qiran radios", repository.getAllRadios().toString())
+                    Log.d("Al-qiran reciters", repository.getAllReciters().toString())
                 }
             }
         }

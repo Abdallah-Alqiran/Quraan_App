@@ -3,11 +3,13 @@ package com.alqiran.quraanapp.data.datasources.remote.retrofit.api
 import com.alqiran.quraanapp.data.Constants.MOSHAF
 import com.alqiran.quraanapp.data.Constants.RADIOS
 import com.alqiran.quraanapp.data.Constants.RECENT_READS
+import com.alqiran.quraanapp.data.Constants.RECITERS
 import com.alqiran.quraanapp.data.Constants.RIWAYAT
 import com.alqiran.quraanapp.data.Constants.SUWAR
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.moshaf.AllMoshaf
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.radio.AllRadios
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.recent_reads.AllRecentReads
+import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.AllReciters
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.riwayat.AllRiwayat
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.suwar.AllSuwar
 import retrofit2.Response
@@ -29,5 +31,8 @@ interface SuwarApi {
 
     @GET(RADIOS)
     suspend fun fetchAllRadios(): Response<AllRadios>
+
+    @GET(RECITERS)
+    suspend fun fetchAllReciters(): Response<AllReciters>
 
 }
