@@ -1,4 +1,4 @@
-package com.alqiran.quraanapp.ui.reciters_package
+package com.alqiran.quraanapp.ui.screens.reciters_package
 
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
@@ -26,8 +26,8 @@ import com.alqiran.quraanapp.ui.components.loading_and_failed.FailedLoadingScree
 import com.alqiran.quraanapp.ui.components.loading_and_failed.LoadingProgressIndicator
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.Reciter
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.RecitersMoshafReading
-import com.alqiran.quraanapp.ui.reciters_package.viewModel.RecitersState
-import com.alqiran.quraanapp.ui.reciters_package.viewModel.RecitersViewModel
+import com.alqiran.quraanapp.ui.screens.reciters_package.viewModel.RecitersState
+import com.alqiran.quraanapp.ui.screens.reciters_package.viewModel.RecitersViewModel
 
 
 @Composable

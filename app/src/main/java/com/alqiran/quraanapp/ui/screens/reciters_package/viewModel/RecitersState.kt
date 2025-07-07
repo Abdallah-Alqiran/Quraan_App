@@ -1,4 +1,4 @@
-package com.alqiran.quraanapp.ui.reciters_package.viewModel
+package com.alqiran.quraanapp.ui.screens.reciters_package.viewModel
 
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.AllReciters
 
