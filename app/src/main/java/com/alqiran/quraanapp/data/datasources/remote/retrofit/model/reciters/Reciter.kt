@@ -4,6 +4,6 @@ data class Reciter(
     val date: String,
     val id: Int,
     val letter: String,
-    val moshaf: List<Moshaf>,
+    val moshaf: List<RecitersMoshafReading>,
     val name: String
 )

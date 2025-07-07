@@ -5,7 +5,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,14 +22,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.AllReciters
+import com.alqiran.quraanapp.ui.components.loading_and_failed.FailedLoadingScreen
+import com.alqiran.quraanapp.ui.components.loading_and_failed.LoadingProgressIndicator
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.Reciter
+import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.RecitersMoshafReading
 import com.alqiran.quraanapp.ui.reciters_package.viewModel.RecitersState
 import com.alqiran.quraanapp.ui.reciters_package.viewModel.RecitersViewModel
 
 
 @Composable
-fun RecitersScreen() {
+fun RecitersScreen(onReciterClick:(riwayatReciter: List<RecitersMoshafReading>, reciterName: String) -> Unit) {
 
     val recitersViewModel = hiltViewModel<RecitersViewModel>()
     val recitersState by recitersViewModel.state.collectAsStateWithLifecycle()
@@ -41,20 +42,21 @@ fun RecitersScreen() {
 
     when (recitersState) {
         is RecitersState.Error -> {
+            FailedLoadingScreen()
             Log.d("Al-qiran", (recitersState as RecitersState.Error).message)
         }
 
-        RecitersState.Loading -> Unit
+        RecitersState.Loading -> LoadingProgressIndicator()
         is RecitersState.Success -> {
             val allRecitersSortedByName = (recitersState as RecitersState.Success).reciters.reciters.sortedBy { it.name }
-            PrintAllReciters(allReciters = allRecitersSortedByName)
+            PrintAllReciters(allReciters = allRecitersSortedByName, onReciterClick)
         }
     }
 
 }
 
 @Composable
-fun PrintAllReciters(allReciters: List<Reciter>) {
+fun PrintAllReciters(allReciters: List<Reciter>, onReciterClick:(riwayatReciter: List<RecitersMoshafReading>, reciterName: String) -> Unit) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -74,7 +76,7 @@ fun PrintAllReciters(allReciters: List<Reciter>) {
                     )
                     .background(MaterialTheme.colorScheme.surface)
                     .clickable {
-
+                        onReciterClick(reciter.moshaf, reciter.name)
                     }
                     .padding(16.dp)
             ) {

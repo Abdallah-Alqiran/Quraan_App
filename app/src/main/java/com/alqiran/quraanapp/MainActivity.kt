@@ -6,13 +6,18 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
 import com.alqiran.quraanapp.data.Constants.BASE_URL
 import com.alqiran.quraanapp.data.RepositoryImpl
 import com.alqiran.quraanapp.data.datasources.remote.RemoteDataSource
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.api.SuwarApi
 import com.alqiran.quraanapp.domain.repository.Repository
 import com.alqiran.quraanapp.theme.QuraanAppTheme
+import com.alqiran.quraanapp.ui.navigation.AppNavHost
 import com.alqiran.quraanapp.ui.reciters_package.RecitersScreen
 import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.Retrofit
@@ -26,8 +31,16 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             QuraanAppTheme {
+                val controller = rememberNavController()
 
-                RecitersScreen()
+                Scaffold (
+                    topBar = {
+
+                    }
+                ){
+                    AppNavHost(modifier = Modifier.padding(it), navController = controller)
+                }
+
 
 //                val api = Retrofit.Builder()
 //                    .baseUrl(BASE_URL)
