@@ -13,6 +13,7 @@ import com.alqiran.quraanapp.data.datasources.remote.RemoteDataSource
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.api.SuwarApi
 import com.alqiran.quraanapp.domain.repository.Repository
 import com.alqiran.quraanapp.theme.QuraanAppTheme
+import com.alqiran.quraanapp.ui.reciters_package.RecitersScreen
 import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -25,21 +26,24 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             QuraanAppTheme {
-                val api = Retrofit.Builder()
-                    .baseUrl(BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build()
-                    .create(SuwarApi::class.java)
-                val remoteDataSource = RemoteDataSource(api)
-                val repository: Repository = RepositoryImpl(remoteDataSource)
-                LaunchedEffect(key1 = true) {
-                    Log.d("Al-qiran Suwar", repository.getAllSuwar().toString())
-                    Log.d("Al-qiran riwayat", repository.getAllRiwayat().toString())
-                    Log.d("Al-qiran moshaf", repository.getAllMoshaf().toString())
-                    Log.d("Al-qiran recentReads", repository.getAllRecentReads().toString())
-                    Log.d("Al-qiran radios", repository.getAllRadios().toString())
-                    Log.d("Al-qiran reciters", repository.getAllReciters().toString())
-                }
+
+                RecitersScreen()
+
+//                val api = Retrofit.Builder()
+//                    .baseUrl(BASE_URL)
+//                    .addConverterFactory(GsonConverterFactory.create())
+//                    .build()
+//                    .create(SuwarApi::class.java)
+//                val remoteDataSource = RemoteDataSource(api)
+//                val repository: Repository = RepositoryImpl(remoteDataSource)
+//                LaunchedEffect(key1 = true) {
+//                    Log.d("Al-qiran Suwar", repository.getAllSuwar().toString())
+//                    Log.d("Al-qiran riwayat", repository.getAllRiwayat().toString())
+//                    Log.d("Al-qiran moshaf", repository.getAllMoshaf().toString())
+//                    Log.d("Al-qiran recentReads", repository.getAllRecentReads().toString())
+//                    Log.d("Al-qiran radios", repository.getAllRadios().toString())
+//                    Log.d("Al-qiran reciters", repository.getAllReciters().toString())
+//                }
             }
         }
     }
