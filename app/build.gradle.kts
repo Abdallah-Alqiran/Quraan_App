@@ -5,18 +5,18 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
 
-    // Serialization
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
     namespace = "com.alqiran.quraanapp"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.alqiran.quraanapp"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -35,19 +35,26 @@ android {
             )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
+
     buildFeatures {
         compose = true
     }
+
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -56,7 +63,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -65,6 +71,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -73,44 +80,41 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    //coil
+    // Coil
     implementation(libs.coil)
     implementation(libs.coil.compose)
 
-    // lottie
+    // Lottie
     implementation(libs.lottie)
     implementation(libs.lottie.compose)
 
-    // viewModel
+    // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.compose.android)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
 
-    // coroutines
+    // Coroutines
     implementation(libs.kotlinx.coroutines.android)
 
-    // retrofit
+    // Retrofit
     implementation(libs.retrofit)
     implementation(libs.okhttp)
     implementation(libs.gson)
     implementation(libs.converter.gson)
 
-    // dataStore
+    // DataStore
     implementation(libs.androidx.datastore.preferences)
 
-    // dependency injection
+    // Dependency Injection (Hilt)
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-
-    // Serialization and navigation
+    // Serialization and Navigation
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.compose.navigation)
 
-
-    // Graphs
+    // Graphs / Foundation / UI
     implementation(libs.androidx.foundation)
     implementation(libs.ui)
-
 }

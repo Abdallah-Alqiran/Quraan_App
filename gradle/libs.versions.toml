@@ -1,43 +1,44 @@
 [versions]
-agp = "8.5.2"
-converterGson = "2.11.0"
-gson = "2.11.0"
-kotlin = "1.9.0"
-coreKtx = "1.15.0"
+agp = "8.11.0"
+converterGson = "3.0.0"
+gson = "2.13.1"
+kotlin = "2.2.0"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.7"
-activityCompose = "1.9.3"
-composeBom = "2024.04.01"
+lifecycleRuntimeKtx = "2.9.1"
+activityCompose = "1.10.1"
+composeBom = "2025.06.01"
 
-coil = "2.5.0"
-coilCompose = "2.5.0"
+coil = "2.7.0"
+coilCompose = "2.7.0"
 
-lottie = "6.6.2"
-lottieCompose = "6.6.2"
+lottie = "6.6.7"
+lottieCompose = "6.6.7"
 
-kotlinxCoroutinesAndroid = "1.9.0"
+kotlinxCoroutinesAndroid = "1.10.2"
 
-datastorePreferences = "1.1.6"
+datastorePreferences = "1.1.7"
 
-hiltAndroid = "2.51.1"
-hiltNavigationCompose = "1.1.0"
+hiltAndroid = "2.56.2"
+hiltNavigationCompose = "1.2.0"
 
-firebaseBom = "32.0.0"
+firebaseBom = "33.16.0"
 
-material = "1.7.8"
+material = "1.8.3"
 
-kotlinxSerializationJson = "1.6.0"
+kotlinxSerializationJson = "1.9.0"
+serialization = "2.2.0"
 
-foundation = "1.5.0"
+foundation = "1.8.3"
 
-okhttp = "4.12.0"
-retrofit = "2.11.0"
+okhttp = "5.1.0"
+retrofit = "3.0.0"
 truth = "1.4.4"
-ui = "1.5.0"
+ui = "1.8.3"
 
-navigationCompose = "2.8.0-beta06"
+navigationCompose = "2.9.1"
 
 
 [libraries]
@@ -98,5 +99,6 @@ androidx-compose-navigation = { group = "androidx.navigation", name = "navigatio
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version = "1.9.10" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serialization" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
