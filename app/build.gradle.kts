@@ -117,4 +117,8 @@ dependencies {
     // Graphs / Foundation / UI
     implementation(libs.androidx.foundation)
     implementation(libs.ui)
+
+    // Material 3 Adaptive
+    implementation(libs.androidx.compose.material3.windowsizeclass)
+    implementation(libs.androidx.material3.adaptive)
 }
