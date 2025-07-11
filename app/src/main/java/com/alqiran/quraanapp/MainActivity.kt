@@ -3,7 +3,6 @@ package com.alqiran.quraanapp
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
@@ -11,9 +10,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation3.runtime.rememberNavBackStack
 import com.alqiran.quraanapp.theme.QuraanAppTheme
-import com.alqiran.quraanapp.ui.navigation.AppNavHost
+import com.alqiran.quraanapp.ui.components.topbar.TopBar
+import com.alqiran.quraanapp.ui.navigation.AppNavDisplay
+import com.alqiran.quraanapp.ui.navigation.RecitersScreenRoute
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
 
@@ -25,21 +26,27 @@ class MainActivity : ComponentActivity() {
         setContent {
             QuraanAppTheme {
 
-                val rememberScreen = remember {
-                    mutableStateOf("")
-                }
-                val controller = rememberNavController()
+                val backStack = rememberNavBackStack(RecitersScreenRoute)
 
-                when(rememberScreen.value) {
-                    "reciters_screen" -> Log.d("Al-qiran", "First")
-                    "riwayat_screen" -> Log.d("Al-qiran", "Second")
+
+                val screenWithValue = remember {
+                    mutableStateOf("" to "")
+                }
+
+                val title: String = when(screenWithValue.value.first) {
+                    "reciters_screen" -> screenWithValue.value.second
+                    "riwayat_screen" -> screenWithValue.value.second
+                    else -> ""
                 }
 
                 Scaffold (
                     topBar = {
+                        TopBar(title = title) {
+                            backStack.removeLastOrNull()
+                        }
                     }
                 ){
-                    AppNavHost(modifier = Modifier.padding(it), navController = controller, rememberScreen)
+                    AppNavDisplay(modifier = Modifier.padding(it), backStack = backStack, screenWithValue =  screenWithValue)
                 }
 
 
