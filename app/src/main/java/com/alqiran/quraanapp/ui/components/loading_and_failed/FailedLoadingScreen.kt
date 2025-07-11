@@ -49,7 +49,7 @@ fun FailedLoadingScreen(onFailed: () -> Unit = {}, errorMessage: String = "Unkno
         )
 
         Text(
-            text = "Something Went Wrong..",
+            text = "للأسف حدث خطأ...",
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -75,7 +75,7 @@ fun FailedLoadingScreen(onFailed: () -> Unit = {}, errorMessage: String = "Unkno
         ) {
             Text(
                 modifier = Modifier.padding(5.dp),
-                text = "Retry",
+                text = "إعادة المحاولة",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onPrimary
             )
