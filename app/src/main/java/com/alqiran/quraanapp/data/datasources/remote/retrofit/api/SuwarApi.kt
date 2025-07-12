@@ -1,11 +1,11 @@
 package com.alqiran.quraanapp.data.datasources.remote.retrofit.api
 
-import com.alqiran.quraanapp.data.Constants.MOSHAF
-import com.alqiran.quraanapp.data.Constants.RADIOS
-import com.alqiran.quraanapp.data.Constants.RECENT_READS
-import com.alqiran.quraanapp.data.Constants.RECITERS
-import com.alqiran.quraanapp.data.Constants.RIWAYAT
-import com.alqiran.quraanapp.data.Constants.SUWAR
+import com.alqiran.quraanapp.data.APIConstants.MOSHAF
+import com.alqiran.quraanapp.data.APIConstants.RADIOS
+import com.alqiran.quraanapp.data.APIConstants.RECENT_READS
+import com.alqiran.quraanapp.data.APIConstants.RECITERS
+import com.alqiran.quraanapp.data.APIConstants.RIWAYAT
+import com.alqiran.quraanapp.data.APIConstants.SUWAR
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.moshaf.AllMoshaf
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.radio.AllRadios
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.recent_reads.AllRecentReads

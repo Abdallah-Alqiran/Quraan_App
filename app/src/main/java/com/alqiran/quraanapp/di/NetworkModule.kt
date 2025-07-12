@@ -1,6 +1,6 @@
 package com.alqiran.quraanapp.di
 
-import com.alqiran.quraanapp.data.Constants.BASE_URL
+import com.alqiran.quraanapp.data.APIConstants.BASE_URL
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.api.SuwarApi
 import dagger.Module
 import dagger.Provides

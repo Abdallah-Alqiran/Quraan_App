@@ -1,6 +1,6 @@
 package com.alqiran.quraanapp.data
 
-object Constants {
+object APIConstants {
     const val BASE_URL = "https://mp3quran.net/api/v3/"
     const val SUWAR = "suwar"
     const val RIWAYAT = "riwayat"
