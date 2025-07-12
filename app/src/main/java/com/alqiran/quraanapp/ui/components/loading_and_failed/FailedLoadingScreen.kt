@@ -24,7 +24,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.alqiran.quraanapp.R
 
 @Composable
-fun FailedLoadingScreen(onFailed: () -> Unit = {}, errorMessage: String = "Unknown Error...") {
+fun FailedLoadingScreen(errorMessage: String = "Unknown Error...", onFailed: () -> Unit = {}) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.failed_annimation))
 
     val animationState = animateLottieCompositionAsState(

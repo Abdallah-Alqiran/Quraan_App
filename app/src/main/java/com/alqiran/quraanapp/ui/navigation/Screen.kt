@@ -10,3 +10,6 @@ data object RecitersScreenRoute: NavKey
 
 @Serializable
 data class RiwayatScreenRoute(val riwayatReciter: List<RecitersMoshafReading>, val reciterName: String): NavKey
+
+@Serializable
+data class SuwarScreenRoute(val suwar: RecitersMoshafReading): NavKey

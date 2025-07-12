@@ -26,6 +26,7 @@ import com.alqiran.quraanapp.ui.components.loading_and_failed.FailedLoadingScree
 import com.alqiran.quraanapp.ui.components.loading_and_failed.LoadingProgressIndicator
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.Reciter
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.RecitersMoshafReading
+import com.alqiran.quraanapp.ui.components.modifiers.surfaceModifier
 import com.alqiran.quraanapp.ui.screens.reciters_package.viewModel.RecitersState
 import com.alqiran.quraanapp.ui.screens.reciters_package.viewModel.RecitersViewModel
 
@@ -34,21 +35,23 @@ import com.alqiran.quraanapp.ui.screens.reciters_package.viewModel.RecitersViewM
 fun RecitersScreen(onReciterClick:(riwayatReciter: List<RecitersMoshafReading>, reciterName: String) -> Unit) {
 
     val recitersViewModel = hiltViewModel<RecitersViewModel>()
-    val recitersState by recitersViewModel.state.collectAsStateWithLifecycle()
+    val state by recitersViewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         recitersViewModel.fetchReciters()
     }
 
-    when (recitersState) {
+    when (state) {
         is RecitersState.Error -> {
-            FailedLoadingScreen()
-            Log.d("Al-qiran", (recitersState as RecitersState.Error).message)
+            FailedLoadingScreen(errorMessage = (state as RecitersState.Error).message) {
+                recitersViewModel.fetchReciters()
+            }
+            Log.d("Al-qiran", (state as RecitersState.Error).message)
         }
 
         RecitersState.Loading -> LoadingProgressIndicator()
         is RecitersState.Success -> {
-            val allRecitersSortedByName = (recitersState as RecitersState.Success).reciters.reciters.sortedBy { it.name }
+            val allRecitersSortedByName = (state as RecitersState.Success).reciters.reciters.sortedBy { it.name }
             PrintAllReciters(allReciters = allRecitersSortedByName, onReciterClick)
         }
     }
@@ -65,16 +68,7 @@ fun PrintAllReciters(allReciters: List<Reciter>, onReciterClick:(riwayatReciter:
         items(allReciters) { reciter ->
             Row(
                 modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth()
-                    .clip(CircleShape)
-                    .border(
-                        border = BorderStroke(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.primaryContainer
-                        ), shape = CircleShape
-                    )
-                    .background(MaterialTheme.colorScheme.surface)
+                    .surfaceModifier()
                     .clickable {
                         onReciterClick(reciter.moshaf, reciter.name)
                     }

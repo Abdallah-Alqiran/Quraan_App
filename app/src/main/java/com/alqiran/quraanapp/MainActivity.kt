@@ -36,6 +36,7 @@ class MainActivity : ComponentActivity() {
                 val title: String = when(screenWithValue.value.first) {
                     "reciters_screen" -> screenWithValue.value.second
                     "riwayat_screen" -> screenWithValue.value.second
+                    "moshaf_screen" -> screenWithValue.value.second
                     else -> ""
                 }
 

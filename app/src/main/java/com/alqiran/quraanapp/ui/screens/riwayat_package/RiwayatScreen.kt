@@ -18,30 +18,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.RecitersMoshafReading
+import com.alqiran.quraanapp.ui.components.modifiers.surfaceModifier
 
 @Composable
-fun RiwayatScreen(riwayatReciter: List<RecitersMoshafReading>, reciterName: String) {
+fun RiwayatScreen(
+    riwayatReciter: List<RecitersMoshafReading>,
+    reciterName: String,
+    onRiwayaClick: (RecitersMoshafReading) -> Unit
+) {
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
+
+        item {
+            Text(
+                "للقارئ الشيخ $reciterName",
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+
         items(riwayatReciter) { riwaya ->
             Row(
                 modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth()
-                    .clip(CircleShape)
-                    .border(
-                        border = BorderStroke(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.primaryContainer
-                        ), shape = CircleShape
-                    )
-                    .background(MaterialTheme.colorScheme.surface)
+                    .surfaceModifier()
                     .clickable {
-                        //onReciterClick(riwaya.moshaf, riwaya.name)
+                        onRiwayaClick(riwaya)
                     }
                     .padding(16.dp)
             ) {
