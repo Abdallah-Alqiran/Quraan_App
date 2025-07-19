@@ -1,8 +1,11 @@
 package com.alqiran.quraanapp
 
+import android.content.ComponentName
 import android.content.Context
+import android.content.ServiceConnection
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.IBinder
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
@@ -10,18 +13,30 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation3.runtime.rememberNavBackStack
+import com.alqiran.quraanapp.data.services.QuranPlayerService
 import com.alqiran.quraanapp.theme.QuraanAppTheme
 import com.alqiran.quraanapp.ui.components.topbar.TopBar
 import com.alqiran.quraanapp.ui.navigation.AppNavDisplay
 import com.alqiran.quraanapp.ui.navigation.RecitersScreenRoute
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+
 
         setContent {
             QuraanAppTheme {
@@ -33,7 +48,7 @@ class MainActivity : ComponentActivity() {
                     mutableStateOf("" to "")
                 }
 
-                val title: String = when(screenWithValue.value.first) {
+                val title: String = when (screenWithValue.value.first) {
                     "reciters_screen" -> screenWithValue.value.second
                     "riwayat_screen" -> screenWithValue.value.second
                     "moshaf_screen" -> screenWithValue.value.second
@@ -41,14 +56,18 @@ class MainActivity : ComponentActivity() {
                     else -> ""
                 }
 
-                Scaffold (
+                Scaffold(
                     topBar = {
                         TopBar(title = title) {
                             backStack.removeLastOrNull()
                         }
                     }
-                ){
-                    AppNavDisplay(modifier = Modifier.padding(it), backStack = backStack, screenWithValue =  screenWithValue)
+                ) {
+                    AppNavDisplay(
+                        modifier = Modifier.padding(it),
+                        backStack = backStack,
+                        screenWithValue = screenWithValue
+                    )
                 }
 
 

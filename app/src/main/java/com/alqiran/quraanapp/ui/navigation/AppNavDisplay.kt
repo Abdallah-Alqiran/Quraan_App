@@ -37,16 +37,16 @@ fun AppNavDisplay(modifier: Modifier = Modifier, backStack: NavBackStack,screenW
                             riwayatReciter = key.riwayatReciter,
                             reciterName = key.reciterName
                         ) {
-                            backStack.add(SuwarScreenRoute(suwar = it))
+                            backStack.add(SuwarScreenRoute(suwar = it, key.reciterName))
                         }
                     }
                 }
 
                 is SuwarScreenRoute -> {
                     NavEntry(key = key) {
-                        screenWithValue.value = "suwar_screen" to "استمع..."
+                        screenWithValue.value = "suwar_screen" to "استمع للشيخ ${key.reciterName}"
 
-                        SuwarScreen(key.suwar)
+                        SuwarScreen(key.suwar, key.reciterName)
                     }
                 }
                 else -> throw RuntimeException("Invalid NavKey")
