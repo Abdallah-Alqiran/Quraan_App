@@ -37,6 +37,7 @@ class MainActivity : ComponentActivity() {
                     "reciters_screen" -> screenWithValue.value.second
                     "riwayat_screen" -> screenWithValue.value.second
                     "moshaf_screen" -> screenWithValue.value.second
+                    "suwar_screen" -> screenWithValue.value.second
                     else -> ""
                 }
 

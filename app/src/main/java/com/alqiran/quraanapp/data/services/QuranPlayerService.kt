@@ -6,11 +6,11 @@ import android.os.Binder
 import android.os.IBinder
 
 
-class QuranBinder: Binder() {
+class QuranBinder : Binder() {
 
 }
 
-class QuranPlayerService: Service() {
+class QuranPlayerService : Service() {
 
     val binder = QuranBinder()
 
@@ -24,6 +24,6 @@ class QuranPlayerService: Service() {
     }
 
 
-//    private fun sendNotification(track: Track)
+//    private fun sendNotification(track: )
 
 }

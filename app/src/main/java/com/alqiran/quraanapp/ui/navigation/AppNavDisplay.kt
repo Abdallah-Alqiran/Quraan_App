@@ -53,36 +53,4 @@ fun AppNavDisplay(modifier: Modifier = Modifier, backStack: NavBackStack,screenW
             }
         }
     )
-
-
-    /** Before NavDisplay**/
-//    NavHost(
-//        navController = navController,
-//        startDestination = RecitersScreenRoute,
-//        modifier = modifier
-//    ) {
-//        composable<RecitersScreenRoute> {
-//            rememberString.value = "reciters_screen"
-//
-//            RecitersScreen { riwayatReciter, reciterName ->
-//                navController.navigate(RiwayatScreenRoute(riwayatReciter, reciterName))
-//            }
-//        }
-//
-//        composable<RiwayatScreenRoute>(
-//            typeMap = mapOf(
-//                typeOf<List<RecitersMoshafReading>>() to CustomNavType.riwayatType,
-//            )
-//        ) {
-//            rememberString.value = "riwayat_screen"
-//
-//            val arguments = it.toRoute<RiwayatScreenRoute>()
-//            RiwayatScreen(
-//                riwayatReciter = arguments.riwayatReciter,
-//                reciterName = arguments.reciterName
-//            )
-//        }
-//
-//    }
-
 }
