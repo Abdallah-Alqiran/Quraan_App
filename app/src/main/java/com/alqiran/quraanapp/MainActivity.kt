@@ -1,11 +1,8 @@
 package com.alqiran.quraanapp
 
-import android.content.ComponentName
 import android.content.Context
-import android.content.ServiceConnection
 import android.content.res.Configuration
 import android.os.Bundle
-import android.os.IBinder
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
@@ -13,36 +10,28 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation3.runtime.rememberNavBackStack
-import com.alqiran.quraanapp.data.services.QuranPlayerService
 import com.alqiran.quraanapp.theme.QuraanAppTheme
 import com.alqiran.quraanapp.ui.components.topbar.TopBar
 import com.alqiran.quraanapp.ui.navigation.AppNavDisplay
 import com.alqiran.quraanapp.ui.navigation.RecitersScreenRoute
+import com.alqiran.quraanapp.ui.utils.RequestNotificationPermission
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
-
 
         setContent {
             QuraanAppTheme {
 
-                val backStack = rememberNavBackStack(RecitersScreenRoute)
+                RequestNotificationPermission()
 
+                val backStack = rememberNavBackStack(RecitersScreenRoute)
 
                 val screenWithValue = remember {
                     mutableStateOf("" to "")
@@ -69,23 +58,6 @@ class MainActivity : ComponentActivity() {
                         screenWithValue = screenWithValue
                     )
                 }
-
-
-//                val api = Retrofit.Builder()
-//                    .baseUrl(BASE_URL)
-//                    .addConverterFactory(GsonConverterFactory.create())
-//                    .build()
-//                    .create(SuwarApi::class.java)
-//                val remoteDataSource = RemoteDataSource(api)
-//                val repository: Repository = RepositoryImpl(remoteDataSource)
-//                LaunchedEffect(key1 = true) {
-//                    Log.d("Al-qiran Suwar", repository.getAllSuwar().toString())
-//                    Log.d("Al-qiran riwayat", repository.getAllRiwayat().toString())
-//                    Log.d("Al-qiran moshaf", repository.getAllMoshaf().toString())
-//                    Log.d("Al-qiran recentReads", repository.getAllRecentReads().toString())
-//                    Log.d("Al-qiran radios", repository.getAllRadios().toString())
-//                    Log.d("Al-qiran reciters", repository.getAllReciters().toString())
-//                }
             }
         }
     }
