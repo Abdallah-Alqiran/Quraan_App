@@ -1,4 +1,4 @@
-package com.alqiran.quraanapp.ui.screens.suwar_package.viewModel
+package com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.suwarViewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,10 +10,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
 class SuwarViewModel @Inject constructor(
-    private val repo: Repository
-): ViewModel() {
+    private val repo: Repository,
+) : ViewModel() {
 
     private val _state = MutableStateFlow<SuwarState>(SuwarState.Loading)
     val state = _state.asStateFlow()

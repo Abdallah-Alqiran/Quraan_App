@@ -13,6 +13,8 @@ import javax.inject.Inject
 class RepositoryImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSource
 ): Repository {
+
+    // All Suwar
     override suspend fun getAllSuwar(): AllSuwar {
         return remoteDataSource.fetchAllSuwar()
     }
@@ -33,6 +35,7 @@ class RepositoryImpl @Inject constructor(
         return remoteDataSource.fetchAllRadios()
     }
 
+    // Reciter with Server
     override suspend fun getAllReciters(): AllReciters {
         return remoteDataSource.fetchAllReciters()
     }

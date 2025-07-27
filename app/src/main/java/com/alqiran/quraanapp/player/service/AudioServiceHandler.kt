@@ -21,13 +21,19 @@ class AudioServiceHandler @Inject constructor(
 
     private val job: Job? = null
 
+    init {
+        exoPlayer.addListener(this)
+    }
+
     fun addMediaItem(mediaItem: MediaItem) {
         exoPlayer.setMediaItem(mediaItem)
         exoPlayer.pause()
     }
 
-//    fun setMediaItem
-
+    fun setMediaItemList(mediaItems: List<MediaItem>) {
+        exoPlayer.setMediaItems(mediaItems)
+        exoPlayer.prepare()
+    }
 
     suspend fun onPlayerEvents(
         playerEvent: PlayerEvent,
@@ -37,14 +43,14 @@ class AudioServiceHandler @Inject constructor(
         when (playerEvent) {
             PlayerEvent.Backward -> exoPlayer.seekBack()
             PlayerEvent.Forward -> exoPlayer.seekForward()
+            PlayerEvent.SeekToNext -> exoPlayer.seekToNext()
             PlayerEvent.PlayPause -> playPause()
-//            PlayerEvent.SeekTo -> exoPlayer.seekTo()
+            PlayerEvent.SeekTo -> exoPlayer.seekTo(seekPosition)
             PlayerEvent.SelectedAudioChange -> {
                 when (selectedAudioIndex) {
                     exoPlayer.currentMediaItemIndex -> {
                         playPause()
                     }
-
                     else -> {
                         exoPlayer.seekToDefaultPosition(selectedAudioIndex)
                         _audioState.value = AudioState.Playing(isPlaying = true)
@@ -57,7 +63,6 @@ class AudioServiceHandler @Inject constructor(
             is PlayerEvent.UpdateProgress -> {
                 exoPlayer.seekTo((exoPlayer.duration * playerEvent.newProgress).toLong())
             }
-            else -> {}
         }
     }
 
@@ -97,7 +102,7 @@ class AudioServiceHandler @Inject constructor(
         _audioState.value = AudioState.Playing(isPlaying = isPlaying)
         _audioState.value = AudioState.CurrentPlaying(exoPlayer.currentMediaItemIndex)
         if (isPlaying) {
-            GlobalScope.launch(Dispatchers.IO) {
+            GlobalScope.launch(Dispatchers.Main) {
                 startProgressUpdate()
             }
         }else {

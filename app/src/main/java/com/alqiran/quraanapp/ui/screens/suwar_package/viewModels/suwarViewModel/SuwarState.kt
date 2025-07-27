@@ -1,4 +1,4 @@
-package com.alqiran.quraanapp.ui.screens.suwar_package.viewModel
+package com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.suwarViewModel
 
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.suwar.AllSuwar
 

@@ -10,7 +10,6 @@ import androidx.media3.ui.PlayerNotificationManager
 
 @UnstableApi
 class AudioNotificationAdapter(
-    private val context: Context,
     private val pendingIntent: PendingIntent?
 ): PlayerNotificationManager.MediaDescriptionAdapter {
     override fun getCurrentContentTitle(player: Player): CharSequence = player.mediaMetadata.albumTitle ?: "Unknown"

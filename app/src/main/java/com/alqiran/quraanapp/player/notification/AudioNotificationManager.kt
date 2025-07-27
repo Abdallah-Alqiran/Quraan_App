@@ -14,11 +14,12 @@ import androidx.media3.session.MediaSessionService
 import androidx.media3.ui.PlayerNotificationManager
 import com.alqiran.quraanapp.R
 import com.alqiran.quraanapp.ui.utils.NotificationConstants.NOTIFICATION_ID
+import com.alqiran.quraanapp.ui.utils.NotificationConstants.NOTIFICATION_CHANNEL_NAME
+import com.alqiran.quraanapp.ui.utils.NotificationConstants.NOTIFICATION_CHANNEL_ID
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-private const val NOTIFICATION_CHANNEL_ID = "audio_player_channel"
-private const val NOTIFICATION_CHANNEL_NAME = "Audio Player"
+
 
 class AudioNotificationManager @Inject constructor(
     @param:ApplicationContext private val context: Context,
@@ -32,7 +33,7 @@ class AudioNotificationManager @Inject constructor(
 
     fun startNotificationService(
         mediaSessionService: MediaSessionService,
-        mediaSession: androidx.media3.session.MediaSession
+        mediaSession: MediaSession
     ) {
         buildNotification(mediaSession)
         startForeGroundNotificationService(mediaSessionService)
@@ -45,14 +46,6 @@ class AudioNotificationManager @Inject constructor(
         mediaSessionService.startForeground(NOTIFICATION_ID, notification)
     }
 
-    private fun createNotificationChannel() {
-        val channel = NotificationChannel(
-            NOTIFICATION_CHANNEL_ID,
-            NOTIFICATION_CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_LOW
-        )
-        notificationManager.createNotificationChannel(channel)
-    }
 
     @OptIn(UnstableApi::class)
     private fun buildNotification(mediaSession: MediaSession) {
@@ -61,7 +54,7 @@ class AudioNotificationManager @Inject constructor(
             NOTIFICATION_ID,
             NOTIFICATION_CHANNEL_ID
         )
-            .setMediaDescriptionAdapter(AudioNotificationAdapter(context, mediaSession.sessionActivity))
+            .setMediaDescriptionAdapter(AudioNotificationAdapter(mediaSession.sessionActivity))
             .setSmallIconResourceId(R.drawable.ic_launcher_foreground)
             .build()
             .also {
@@ -72,5 +65,13 @@ class AudioNotificationManager @Inject constructor(
                 it.setPriority(NotificationCompat.PRIORITY_LOW)
                 it.setPlayer(exoPlayer)
             }
+    }
+    private fun createNotificationChannel() {
+        val channel = NotificationChannel(
+            NOTIFICATION_CHANNEL_ID,
+            NOTIFICATION_CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_LOW
+        )
+        notificationManager.createNotificationChannel(channel)
     }
 }
