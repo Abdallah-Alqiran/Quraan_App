@@ -67,15 +67,16 @@ class AudioViewModel @Inject constructor(
         }
     }
 
-    fun getAllAudioData(allAudio: List<Audio>) {
+    fun setAllAudioData(allAudio: List<Audio>) {
         audioList = allAudio
         setMediaItems()
     }
 
     private fun setMediaItems() {
         audioList.map { audio ->
+            val audioNumber = (audio.surahNumber.toInt() + 1).toString()
             MediaItem.Builder()
-                .setUri("${audio.server}${audio.surahNumber.padStart(3, '0')}.mp3")
+                .setUri("${audio.server}${audioNumber.padStart(3, '0')}.mp3")
                 .setMediaMetadata(
                     MediaMetadata.Builder()
                         .setAlbumArtist(audio.reciter)
@@ -101,16 +102,27 @@ class AudioViewModel @Inject constructor(
     }
 
 
-    fun onUiEvents(audioEvent: AudioEvents) = viewModelScope.launch{
+    fun onAudioEvents(audioEvent: AudioEvents) = viewModelScope.launch{
         when(audioEvent) {
             AudioEvents.Backward -> audioServiceHandler.onPlayerEvents(PlayerEvent.Backward)
             AudioEvents.Forward -> audioServiceHandler.onPlayerEvents(PlayerEvent.Forward)
             AudioEvents.PlayPause -> audioServiceHandler.onPlayerEvents(PlayerEvent.PlayPause)
             is AudioEvents.SeekTo ->  audioServiceHandler.onPlayerEvents(playerEvent = PlayerEvent.SeekTo, seekPosition = ((duration * audioEvent.position) / 100f).toLong())
             AudioEvents.SeekToNext ->  audioServiceHandler.onPlayerEvents(PlayerEvent.SeekToNext)
-            is AudioEvents.SelectedAudioChange ->  audioServiceHandler.onPlayerEvents(PlayerEvent.SelectedAudioChange, selectedAudioIndex = audioEvent.index)
-            is AudioEvents.UpdateProgress ->  audioServiceHandler.onPlayerEvents(PlayerEvent.UpdateProgress(audioEvent.newProgress))
+            is AudioEvents.SelectedAudioChange -> audioServiceHandler.onPlayerEvents(PlayerEvent.SelectedAudioChange, selectedAudioIndex = audioEvent.index)
+            is AudioEvents.UpdateProgress -> {
+                audioServiceHandler.onPlayerEvents(PlayerEvent.UpdateProgress(audioEvent.newProgress))
+                progress = audioEvent.newProgress
+            }
         }
+    }
+
+
+    override fun onCleared() {
+        viewModelScope.launch {
+            audioServiceHandler.onPlayerEvents(PlayerEvent.Stop)
+        }
+        super.onCleared()
     }
 }
 //  val surahUrl = server + suwarList[index].padStart(3, '0')+ ".mp3"

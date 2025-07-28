@@ -32,10 +32,14 @@
         </activity>
 
         <service
-            android:name=".data.services.QuranPlayerService"
+            android:name=".player.service.AudioService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="mediaPlayback"/>
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService"/>
+            </intent-filter>
+        </service>
 
     </application>
 

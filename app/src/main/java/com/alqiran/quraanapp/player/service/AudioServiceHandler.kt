@@ -1,5 +1,6 @@
 package com.alqiran.quraanapp.player.service
 
+import android.util.Log
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
@@ -25,13 +26,8 @@ class AudioServiceHandler @Inject constructor(
         exoPlayer.addListener(this)
     }
 
-    fun addMediaItem(mediaItem: MediaItem) {
-        exoPlayer.setMediaItem(mediaItem)
-        exoPlayer.pause()
-    }
-
     fun setMediaItemList(mediaItems: List<MediaItem>) {
-        exoPlayer.setMediaItems(mediaItems)
+        exoPlayer.addMediaItems(mediaItems)
         exoPlayer.prepare()
     }
 
@@ -49,10 +45,12 @@ class AudioServiceHandler @Inject constructor(
             PlayerEvent.SelectedAudioChange -> {
                 when (selectedAudioIndex) {
                     exoPlayer.currentMediaItemIndex -> {
+                        Log.d("Al-qiran", "from playerEvent Play Pause: $selectedAudioIndex")
                         playPause()
                     }
                     else -> {
                         exoPlayer.seekToDefaultPosition(selectedAudioIndex)
+                        Log.d("Al-qiran", "from playerEvent else: $selectedAudioIndex ${exoPlayer.currentMediaItem?.localConfiguration?.uri}")
                         _audioState.value = AudioState.Playing(isPlaying = true)
                         exoPlayer.playWhenReady = true
                         startProgressUpdate()

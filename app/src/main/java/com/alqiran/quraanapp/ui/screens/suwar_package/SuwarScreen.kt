@@ -1,5 +1,8 @@
 package com.alqiran.quraanapp.ui.screens.suwar_package
 
+import android.content.Intent
+import android.os.Build
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,10 +36,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startForegroundService
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.RecitersMoshafReading
@@ -48,6 +52,9 @@ import com.alqiran.quraanapp.R.drawable.ic_play
 import com.alqiran.quraanapp.R.drawable.ic_skip_next
 import com.alqiran.quraanapp.R.drawable.ic_skip_previous
 import com.alqiran.quraanapp.data.datasources.remote.model.Audio
+import com.alqiran.quraanapp.player.service.AudioService
+import com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.audioViewModel.AudioEvents
+import com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.audioViewModel.AudioViewModel
 import com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.suwarViewModel.SuwarState
 import com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.suwarViewModel.SuwarViewModel
 import kotlin.math.floor
@@ -57,7 +64,12 @@ import kotlin.math.floor
 fun SuwarScreen(suwarListAndServer: RecitersMoshafReading, reciterName: String) {
 
     val suwarViewModel = hiltViewModel<SuwarViewModel>()
+    val audioViewModel = hiltViewModel<AudioViewModel>()
     val state by suwarViewModel.state.collectAsStateWithLifecycle()
+
+    var isServiceRunning = false
+
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         suwarViewModel.fetchSuwar()
@@ -75,23 +87,52 @@ fun SuwarScreen(suwarListAndServer: RecitersMoshafReading, reciterName: String) 
         }
 
         is SuwarState.Success -> {
+
+            val audioList = mutableListOf<Audio>()
+
+            val suwarListNumber = suwarListAndServer.surahList.split(",")
+
+            for (index in 0..<suwarListNumber.size) {
+                audioList.add(
+                    Audio(
+                        surahNumber = index.toString(),
+                        server = suwarListAndServer.server,
+                        surah = (state as SuwarState.Success).allSuwar.suwar[suwarListNumber[index].toInt() - 1].name,
+                        reciter = reciterName,
+                        duration = 0
+                    )
+                )
+            }
+            audioViewModel.setAllAudioData(audioList)
+
             PrintAllSuwar(
                 suwarListAndServer = suwarListAndServer,
                 allSuwar = (state as SuwarState.Success).allSuwar,
-                reciterName
+                reciterName = reciterName,
+                progress = audioViewModel.progress,
+                onProgress = { audioViewModel.onAudioEvents(AudioEvents.SeekTo(it)) },
+                isAudioPlaying = audioViewModel.isPlaying,
+                audioList = audioList,
+                currentPlayingAudio = audioViewModel.currentSelectedAudio,
+                onStart = {
+                    audioViewModel.onAudioEvents(AudioEvents.PlayPause)
+                },
+                onItemClick = {
+                    Log.d("Al-qiran", "from onItemClick in SuwarScreen: $it")
+                    audioViewModel.onAudioEvents(AudioEvents.SelectedAudioChange(it))
+                    if (!isServiceRunning) {
+                        val intent = Intent(context, AudioService::class.java)
+                        startForegroundService(context, intent)
+                    }
+                    isServiceRunning = true
+                },
+                onNext = {
+                    audioViewModel.onAudioEvents(AudioEvents.SeekToNext)
+                }
             )
         }
     }
 }
-/*    progress: Float,
-    onProgress: (Float) -> Unit,
-    isAudioPlaying: Boolean,
-    currentPlayingAudio: Audio,
-    audiList: List<Audio>,
-    onStart: () -> Unit,
-    onItemClick: (Int) -> Unit,
-    onNext: () -> Unit,
-*/
 
 @Composable
 fun PrintAllSuwar(
@@ -99,34 +140,21 @@ fun PrintAllSuwar(
     allSuwar: AllSuwar,
     reciterName: String,
     progress: Float = 0f,
-    onProgress: () -> Unit = {},
+    onProgress: (Float) -> Unit,
     isAudioPlaying: Boolean = false,
+    audioList: List<Audio>,
     currentPlayingAudio: Audio = Audio(),
     audiList: List<Audio> = listOf(),
     onStart: () -> Unit = {},
     onItemClick: (Int) -> Unit = {},
     onNext: () -> Unit = {},
 ) {
-    val audioList = mutableListOf<Audio>()
 
-    val suwarListNumber = suwarListAndServer.surahList.split(",")
-
-    for (index in 0..<suwarListNumber.size) {
-        audioList.add(
-            Audio(
-                surahNumber = index.toString(),
-                server = suwarListAndServer.server,
-                surah = allSuwar.suwar[suwarListNumber[index].toInt() - 1].name,
-                reciter = reciterName,
-                duration = 0
-            )
-        )
-    }
     Scaffold(
         bottomBar = {
             BottomBarPlayer(
                 progress = progress,
-                onProgress = { onProgress() },
+                onProgress = onProgress,
                 audio = audioList[0],
                 isAudioPlaying = isAudioPlaying,
                 onStart = {},
@@ -164,6 +192,9 @@ fun PrintAllSuwar(
                         .clip(RoundedCornerShape(8.dp))
                         .background(MaterialTheme.colorScheme.surface)
                         .padding(16.dp)
+                        .clickable {
+                            onItemClick(index)
+                        }
 
                 ) {
 
@@ -208,7 +239,7 @@ fun PrintAllSuwar(
                         }
 
                         IconButton(onClick = {
-                            // TODO Play Pause
+                            onStart()
 
                         }) {
                             Icon(
