@@ -5,6 +5,7 @@ sealed class AudioEvents {
     data class SelectedAudioChange(val index: Int) : AudioEvents()
     data class SeekTo(val position: Float) : AudioEvents()
     object SeekToNext : AudioEvents()
+    object SeekToPrevious : AudioEvents()
     object Backward : AudioEvents()
     object Forward : AudioEvents()
     data class UpdateProgress(val newProgress: Float) : AudioEvents()

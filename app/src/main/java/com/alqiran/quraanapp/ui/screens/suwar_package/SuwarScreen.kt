@@ -53,6 +53,10 @@ import com.alqiran.quraanapp.R.drawable.ic_skip_next
 import com.alqiran.quraanapp.R.drawable.ic_skip_previous
 import com.alqiran.quraanapp.data.datasources.remote.model.Audio
 import com.alqiran.quraanapp.player.service.AudioService
+import com.alqiran.quraanapp.ui.components.modifiers.surfaceModifier
+import com.alqiran.quraanapp.ui.screens.suwar_package.components.BottomBarPlayer
+import com.alqiran.quraanapp.ui.screens.suwar_package.utils.PlayerIconItem
+import com.alqiran.quraanapp.ui.screens.suwar_package.utils.timeStampToDuration
 import com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.audioViewModel.AudioEvents
 import com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.audioViewModel.AudioViewModel
 import com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.suwarViewModel.SuwarState
@@ -88,22 +92,21 @@ fun SuwarScreen(suwarListAndServer: RecitersMoshafReading, reciterName: String) 
 
         is SuwarState.Success -> {
 
-            val audioList = mutableListOf<Audio>()
-
             val suwarListNumber = suwarListAndServer.surahList.split(",")
 
-            for (index in 0..<suwarListNumber.size) {
-                audioList.add(
-                    Audio(
-                        surahNumber = index.toString(),
-                        server = suwarListAndServer.server,
-                        surah = (state as SuwarState.Success).allSuwar.suwar[suwarListNumber[index].toInt() - 1].name,
-                        reciter = reciterName,
-                        duration = 0
-                    )
+            val audioList = suwarListNumber.mapIndexed { index, surahNumber ->
+                Audio(
+                    surahNumber = index.toString(),
+                    server = suwarListAndServer.server,
+                    surah = (state as SuwarState.Success).allSuwar.suwar[surahNumber.toInt() - 1].name,
+                    reciter = reciterName,
+                    duration = 0
                 )
             }
-            audioViewModel.setAllAudioData(audioList)
+
+            LaunchedEffect(suwarListAndServer.surahList, suwarListAndServer.server, reciterName) {
+                audioViewModel.setAllAudioData(audioList)
+            }
 
             PrintAllSuwar(
                 suwarListAndServer = suwarListAndServer,
@@ -118,8 +121,9 @@ fun SuwarScreen(suwarListAndServer: RecitersMoshafReading, reciterName: String) 
                     audioViewModel.onAudioEvents(AudioEvents.PlayPause)
                 },
                 onItemClick = {
-                    Log.d("Al-qiran", "from onItemClick in SuwarScreen: $it")
-                    audioViewModel.onAudioEvents(AudioEvents.SelectedAudioChange(it))
+                    val item = suwarListNumber[it].toInt()
+                    Log.d("Al-qiran", "from onItemClick in SuwarScreen: item: $item index: ${suwarListNumber[it]} the size: ${suwarListNumber.size}")
+                    audioViewModel.onAudioEvents(AudioEvents.SelectedAudioChange(item))
                     if (!isServiceRunning) {
                         val intent = Intent(context, AudioService::class.java)
                         startForegroundService(context, intent)
@@ -128,6 +132,9 @@ fun SuwarScreen(suwarListAndServer: RecitersMoshafReading, reciterName: String) 
                 },
                 onNext = {
                     audioViewModel.onAudioEvents(AudioEvents.SeekToNext)
+                },
+                onPrevious = {
+                    audioViewModel.onAudioEvents(AudioEvents.SeekToPrevious)
                 }
             )
         }
@@ -145,9 +152,10 @@ fun PrintAllSuwar(
     audioList: List<Audio>,
     currentPlayingAudio: Audio = Audio(),
     audiList: List<Audio> = listOf(),
-    onStart: () -> Unit = {},
-    onItemClick: (Int) -> Unit = {},
-    onNext: () -> Unit = {},
+    onStart: () -> Unit,
+    onItemClick: (Int) -> Unit,
+    onNext: () -> Unit,
+    onPrevious: () -> Unit,
 ) {
 
     Scaffold(
@@ -157,9 +165,15 @@ fun PrintAllSuwar(
                 onProgress = onProgress,
                 audio = audioList[0],
                 isAudioPlaying = isAudioPlaying,
-                onStart = {},
-                onNext = {},
-                onPrevious = {}
+                onStart = {
+                    onStart()
+                },
+                onNext = {
+                    onNext()
+                },
+                onPrevious = {
+                    onPrevious()
+                }
             )
         }
     ) {
@@ -171,158 +185,25 @@ fun PrintAllSuwar(
         ) {
             val suwarListNumber = suwarListAndServer.surahList.split(",")
             items(suwarListNumber.size) { index ->
-
-                AudioItem(
-                    audio = audioList[index]
-                ) {
-                    onItemClick(index)
-                }
-
                 Column(
                     modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth()
-                        .border(
-                            border = BorderStroke(
-                                width = 2.dp,
-                                color = MaterialTheme.colorScheme.primaryContainer
-                            ),
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(16.dp)
+                        .surfaceModifier(shape = RoundedCornerShape(8.dp))
                         .clickable {
                             onItemClick(index)
                         }
+                        .padding(16.dp)
 
                 ) {
-
                     Text(
                         text = "${suwarListNumber[index]} - سورة ${allSuwar.suwar[suwarListNumber[index].toInt() - 1].name}",
                         color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier
                     )
-
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(text = timeStampToDuration(audioList[index].duration))
-                        Slider(
-                            value = 20f, onValueChange = {}, valueRange = 0f..100f,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 8.dp)
-                        )
-
-                        Text(text = timeStampToDuration(audioList[index].duration))
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = {
-                            // TODO NEXT
-                        }) {
-                            Icon(
-                                painter = painterResource(ic_skip_next),
-                                contentDescription = "Go Next"
-                            )
-                        }
-
-                        IconButton(onClick = {
-                            onStart()
-
-                        }) {
-                            Icon(
-                                painter = if (true) painterResource(ic_play) else painterResource(
-                                    ic_pause
-                                ),
-                                contentDescription = "Play_Pause"
-                            )
-                        }
-
-                        IconButton(onClick = {
-                            // TODO Previous
-                        }) {
-                            Icon(
-                                painter = painterResource(ic_skip_previous),
-                                contentDescription = "Go Previous"
-                            )
-                        }
-                    }
                 }
             }
         }
     }
-}
-
-@Composable
-fun AudioItem(audio: Audio, onItemClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp)
-            .clickable {
-                onItemClick()
-            }
-    ) { }
-}
-
-@Composable
-fun BottomBarPlayer(
-    progress: Float,
-    onProgress: (Float) -> Unit,
-    audio: Audio,
-    isAudioPlaying: Boolean,
-    onStart: () -> Unit,
-    onNext: () -> Unit,
-    onPrevious: () -> Unit
-) {
-    BottomAppBar(
-
-    ) {
-        Column(
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ArtistInfo(audio = audio, modifier = Modifier.weight(1f))
-
-                MediaPlayerController(isAudioPlaying, onStart, onNext, onPrevious)
-
-                Slider(
-                    value = progress,
-                    onValueChange = {
-                        onProgress(it)
-                    },
-                    valueRange = 0f..100f
-                )
-            }
-        }
-    }
-}
-
-
-private fun timeStampToDuration(position: Long): String {
-    val totalSecond = floor(position / 1E3).toInt()
-    val minutes = totalSecond / 60
-    val remainingSeconds = totalSecond - (minutes * 60)
-    return if (position < 0) "--:--"
-    else "%d:%02d".format(minutes, remainingSeconds)
 }
 
 
@@ -342,7 +223,7 @@ fun ArtistInfo(modifier: Modifier = Modifier, audio: Audio) {
 
         Spacer(modifier = Modifier.size(4.dp))
 
-        Column() {
+        Column {
             Text(
                 text = audio.surah,
                 style = MaterialTheme.typography.titleMedium,
@@ -359,74 +240,5 @@ fun ArtistInfo(modifier: Modifier = Modifier, audio: Audio) {
                 maxLines = 1
             )
         }
-    }
-}
-
-
-@Composable
-fun PlayerIconItem(
-    modifier: Modifier = Modifier,
-    icon: Int,
-    borderStroke: BorderStroke? = null,
-    backgroundColor: Color = MaterialTheme.colorScheme.surface,
-    color: Color = MaterialTheme.colorScheme.onSurface,
-    onClick: () -> Unit
-) {
-    Surface(
-        shape = CircleShape,
-        border = borderStroke,
-        modifier = Modifier
-            .clip(CircleShape)
-            .clickable {
-                onClick()
-            },
-        contentColor = color,
-        color = backgroundColor
-    ) {
-        Box(modifier = modifier.padding(4.dp)) {
-            Icon(
-                painter = painterResource(icon),
-                contentDescription = "image"
-            )
-        }
-    }
-}
-
-
-@Composable
-fun MediaPlayerController(
-    isAudioPlaying: Boolean,
-    onStart: () -> Unit,
-    onNext: () -> Unit,
-    onPrevious: () -> Unit,
-) {
-
-    Icon(
-        painter = painterResource(ic_skip_previous),
-        contentDescription = "Go Next",
-        modifier = Modifier.clickable {
-            onPrevious()
-        }
-    )
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .height(56.dp)
-            .padding(4.dp)
-    ) {
-        PlayerIconItem(icon = if (isAudioPlaying) ic_pause else ic_play) {
-            onStart()
-        }
-        Spacer(modifier = Modifier.size(8.dp))
-
-        Icon(
-            painter = painterResource(ic_skip_next),
-            contentDescription = "Go Next",
-            modifier = Modifier.clickable {
-                onNext()
-            }
-        )
-
     }
 }

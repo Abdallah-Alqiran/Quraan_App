@@ -27,9 +27,13 @@ class AudioServiceHandler @Inject constructor(
     }
 
     fun setMediaItemList(mediaItems: List<MediaItem>) {
+        exoPlayer.stop()
+        exoPlayer.clearMediaItems()
         exoPlayer.addMediaItems(mediaItems)
+        exoPlayer.playWhenReady = false
         exoPlayer.prepare()
     }
+
 
     suspend fun onPlayerEvents(
         playerEvent: PlayerEvent,
@@ -40,6 +44,7 @@ class AudioServiceHandler @Inject constructor(
             PlayerEvent.Backward -> exoPlayer.seekBack()
             PlayerEvent.Forward -> exoPlayer.seekForward()
             PlayerEvent.SeekToNext -> exoPlayer.seekToNext()
+            PlayerEvent.SeekToPrevious -> exoPlayer.seekToPrevious()
             PlayerEvent.PlayPause -> playPause()
             PlayerEvent.SeekTo -> exoPlayer.seekTo(seekPosition)
             PlayerEvent.SelectedAudioChange -> {

@@ -2,6 +2,7 @@
 
 package com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.audioViewModel
 
+import android.util.Log
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -68,13 +69,15 @@ class AudioViewModel @Inject constructor(
     }
 
     fun setAllAudioData(allAudio: List<Audio>) {
+        if (audioList == allAudio) return
         audioList = allAudio
         setMediaItems()
     }
 
     private fun setMediaItems() {
         audioList.map { audio ->
-            val audioNumber = (audio.surahNumber.toInt() + 1).toString()
+            Log.i("Al-qiran", "Audio item from viewModel: $audio")
+            val audioNumber = audio.surahNumber
             MediaItem.Builder()
                 .setUri("${audio.server}${audioNumber.padStart(3, '0')}.mp3")
                 .setMediaMetadata(
@@ -86,6 +89,7 @@ class AudioViewModel @Inject constructor(
                 )
                 .build()
         }.also {
+            Log.i("Al-qiran", "$it")
             audioServiceHandler.setMediaItemList(it)
         }
     }
@@ -102,14 +106,23 @@ class AudioViewModel @Inject constructor(
     }
 
 
-    fun onAudioEvents(audioEvent: AudioEvents) = viewModelScope.launch{
-        when(audioEvent) {
+    fun onAudioEvents(audioEvent: AudioEvents) = viewModelScope.launch {
+        when (audioEvent) {
             AudioEvents.Backward -> audioServiceHandler.onPlayerEvents(PlayerEvent.Backward)
             AudioEvents.Forward -> audioServiceHandler.onPlayerEvents(PlayerEvent.Forward)
             AudioEvents.PlayPause -> audioServiceHandler.onPlayerEvents(PlayerEvent.PlayPause)
-            is AudioEvents.SeekTo ->  audioServiceHandler.onPlayerEvents(playerEvent = PlayerEvent.SeekTo, seekPosition = ((duration * audioEvent.position) / 100f).toLong())
-            AudioEvents.SeekToNext ->  audioServiceHandler.onPlayerEvents(PlayerEvent.SeekToNext)
-            is AudioEvents.SelectedAudioChange -> audioServiceHandler.onPlayerEvents(PlayerEvent.SelectedAudioChange, selectedAudioIndex = audioEvent.index)
+            is AudioEvents.SeekTo -> audioServiceHandler.onPlayerEvents(
+                playerEvent = PlayerEvent.SeekTo,
+                seekPosition = ((duration * audioEvent.position) / 100f).toLong()
+            )
+
+            AudioEvents.SeekToNext -> audioServiceHandler.onPlayerEvents(PlayerEvent.SeekToNext)
+            AudioEvents.SeekToPrevious -> audioServiceHandler.onPlayerEvents(PlayerEvent.SeekToPrevious)
+            is AudioEvents.SelectedAudioChange -> audioServiceHandler.onPlayerEvents(
+                PlayerEvent.SelectedAudioChange,
+                selectedAudioIndex = audioEvent.index
+            )
+
             is AudioEvents.UpdateProgress -> {
                 audioServiceHandler.onPlayerEvents(PlayerEvent.UpdateProgress(audioEvent.newProgress))
                 progress = audioEvent.newProgress
@@ -125,4 +138,3 @@ class AudioViewModel @Inject constructor(
         super.onCleared()
     }
 }
-//  val surahUrl = server + suwarList[index].padStart(3, '0')+ ".mp3"
