@@ -41,10 +41,38 @@ class AudioServiceHandler @Inject constructor(
         seekPosition: Long = 0
     ) {
         when (playerEvent) {
-            PlayerEvent.Backward -> exoPlayer.seekBack()
-            PlayerEvent.Forward -> exoPlayer.seekForward()
-            PlayerEvent.SeekToNext -> exoPlayer.seekToNext()
-            PlayerEvent.SeekToPrevious -> exoPlayer.seekToPrevious()
+            PlayerEvent.Backward -> {
+                Log.d("Al-qiran", "from playerEvent Backward: ${exoPlayer.currentMediaItemIndex} media count: ${exoPlayer.mediaItemCount}")
+                if (exoPlayer.currentMediaItemIndex == 0) {
+                    exoPlayer.seekToDefaultPosition(exoPlayer.mediaItemCount - 1)
+                } else {
+                    exoPlayer.seekBack()
+                }
+            }
+            PlayerEvent.Forward -> {
+                Log.d("Al-qiran", "from playerEvent Forward: ${exoPlayer.currentMediaItemIndex} media count: ${exoPlayer.mediaItemCount}")
+                if (exoPlayer.currentMediaItemIndex == exoPlayer.mediaItemCount - 1) {
+                    exoPlayer.seekToDefaultPosition(0)
+                } else {
+                    exoPlayer.seekForward()
+                }
+            }
+            PlayerEvent.SeekToNext -> {
+                Log.d("Al-qiran", "from playerEvent SeekToNext: ${exoPlayer.currentMediaItemIndex} media count: ${exoPlayer.mediaItemCount}")
+                if (exoPlayer.currentMediaItemIndex == exoPlayer.mediaItemCount - 1) {
+                    exoPlayer.seekToDefaultPosition(0)
+                } else {
+                    exoPlayer.seekToNext()
+                }
+            }
+            PlayerEvent.SeekToPrevious -> {
+                Log.d("Al-qiran", "from playerEvent SeekToPrevious: ${exoPlayer.currentMediaItemIndex} media count: ${exoPlayer.mediaItemCount}")
+                if (exoPlayer.currentMediaItemIndex == 0) {
+                    exoPlayer.seekToDefaultPosition(exoPlayer.mediaItemCount - 1)
+                } else {
+                    exoPlayer.seekToPrevious()
+                }
+            }
             PlayerEvent.PlayPause -> playPause()
             PlayerEvent.SeekTo -> exoPlayer.seekTo(seekPosition)
             PlayerEvent.SelectedAudioChange -> {
@@ -53,15 +81,20 @@ class AudioServiceHandler @Inject constructor(
                         Log.d("Al-qiran", "from playerEvent Play Pause: $selectedAudioIndex")
                         playPause()
                     }
+
                     else -> {
                         exoPlayer.seekToDefaultPosition(selectedAudioIndex)
-                        Log.d("Al-qiran", "from playerEvent else: $selectedAudioIndex ${exoPlayer.currentMediaItem?.localConfiguration?.uri}")
+                        Log.d(
+                            "Al-qiran",
+                            "from playerEvent else: $selectedAudioIndex ${exoPlayer.currentMediaItem?.localConfiguration?.uri}"
+                        )
                         _audioState.value = AudioState.Playing(isPlaying = true)
                         exoPlayer.playWhenReady = true
                         startProgressUpdate()
                     }
                 }
             }
+
             PlayerEvent.Stop -> stopProgressUpdate()
             is PlayerEvent.UpdateProgress -> {
                 exoPlayer.seekTo((exoPlayer.duration * playerEvent.newProgress).toLong())
@@ -108,7 +141,7 @@ class AudioServiceHandler @Inject constructor(
             GlobalScope.launch(Dispatchers.Main) {
                 startProgressUpdate()
             }
-        }else {
+        } else {
             stopProgressUpdate()
         }
     }

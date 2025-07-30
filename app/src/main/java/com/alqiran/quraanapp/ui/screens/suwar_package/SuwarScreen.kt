@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -94,17 +95,20 @@ fun SuwarScreen(suwarListAndServer: RecitersMoshafReading, reciterName: String) 
 
             val suwarListNumber = suwarListAndServer.surahList.split(",")
 
-            val audioList = suwarListNumber.mapIndexed { index, surahNumber ->
-                Audio(
-                    surahNumber = index.toString(),
-                    server = suwarListAndServer.server,
-                    surah = (state as SuwarState.Success).allSuwar.suwar[surahNumber.toInt() - 1].name,
-                    reciter = reciterName,
-                    duration = 0
-                )
+            val audioList = remember(suwarListAndServer.surahList, suwarListAndServer.server, reciterName) {
+                suwarListNumber.map { surahNumber ->
+                    Audio(
+                        surahNumber = surahNumber, // Use the actual surah number from API
+                        server = suwarListAndServer.server,
+                        surah = (state as SuwarState.Success).allSuwar.suwar[surahNumber.toInt() - 1].name,
+                        reciter = reciterName,
+                        duration = 0
+                    )
+                }
             }
 
-            LaunchedEffect(suwarListAndServer.surahList, suwarListAndServer.server, reciterName) {
+            LaunchedEffect(audioList) {
+                Log.e("Al-qiran", "Audio List: $audioList")
                 audioViewModel.setAllAudioData(audioList)
             }
 
@@ -121,9 +125,10 @@ fun SuwarScreen(suwarListAndServer: RecitersMoshafReading, reciterName: String) 
                     audioViewModel.onAudioEvents(AudioEvents.PlayPause)
                 },
                 onItemClick = {
-                    val item = suwarListNumber[it].toInt()
-                    Log.d("Al-qiran", "from onItemClick in SuwarScreen: item: $item index: ${suwarListNumber[it]} the size: ${suwarListNumber.size}")
-                    audioViewModel.onAudioEvents(AudioEvents.SelectedAudioChange(item))
+                    val surahIndex = it
+                    val surahNumber = suwarListNumber[surahIndex].toInt()
+                    Log.d("Al-qiran", "from onItemClick in SuwarScreen: surahNumber: $surahNumber index: $surahIndex the size: ${suwarListNumber.size}")
+                    audioViewModel.onAudioEvents(AudioEvents.SelectedAudioChange(surahIndex))
                     if (!isServiceRunning) {
                         val intent = Intent(context, AudioService::class.java)
                         startForegroundService(context, intent)
