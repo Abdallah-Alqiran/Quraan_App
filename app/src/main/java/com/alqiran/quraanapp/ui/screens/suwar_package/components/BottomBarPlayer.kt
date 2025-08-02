@@ -7,13 +7,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.alqiran.quraanapp.data.datasources.remote.model.Audio
-import com.alqiran.quraanapp.ui.screens.suwar_package.ArtistInfo
+import com.alqiran.quraanapp.ui.screens.suwar_package.utils.timeStampToDuration
 
 @Composable
 fun BottomBarPlayer(
@@ -26,28 +29,53 @@ fun BottomBarPlayer(
     onPrevious: () -> Unit
 ) {
     BottomAppBar(
-
-    ) {
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(150.dp)
+    ){
         Column(
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
         ) {
+
+            ArtistInfo(audio = audio, modifier = Modifier.fillMaxWidth())
+
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                ArtistInfo(audio = audio, modifier = Modifier.weight(1f))
 
                 MediaPlayerController(isAudioPlaying, onStart, onNext, onPrevious)
+
+                Text(
+                    text = timeStampToDuration(progress.toLong()),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
 
                 Slider(
                     value = progress,
                     onValueChange = {
                         onProgress(it)
                     },
-                    valueRange = 0f..100f
+                    valueRange = 0f..100f,
+                    modifier = Modifier.weight(2f),
+                    colors = SliderDefaults.colors(
+                        thumbColor = MaterialTheme.colorScheme.primary,
+                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                        inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.24f)
+                    ),
+                    steps = 0
+                )
+                Text(
+                    text = timeStampToDuration(100L),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(start = 8.dp)
                 )
             }
         }
