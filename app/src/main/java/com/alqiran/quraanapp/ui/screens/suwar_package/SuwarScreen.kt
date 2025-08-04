@@ -153,9 +153,20 @@ fun PrintAllSuwar(
                     onStart()
                 },
                 onNext = {
+                    if (audioItem.intValue < audioList.size - 1) {
+                        audioItem.intValue += 1
+                    } else {
+                        audioItem.intValue = 0
+                    }
                     onNext()
                 },
                 onPrevious = {
+                    if (audioItem.intValue > 0) {
+                        audioItem.intValue -= 1
+                    }
+                    else {
+                        audioItem.intValue = audioList.size - 1
+                    }
                     onPrevious()
                 }
             )
