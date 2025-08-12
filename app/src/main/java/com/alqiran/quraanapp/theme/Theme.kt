@@ -27,7 +27,7 @@ private val DarkColorScheme = darkColorScheme(
     onError = Color(0xFF000000),
     primaryContainer = Color(0xFF00BCD4),
     secondaryContainer = Color(0xFF00E777),
-    surfaceTint = Color(0xFF94A3B8)
+    surfaceTint = Color(0xFF2A3444)
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -50,7 +50,7 @@ private val LightColorScheme = lightColorScheme(
     onError = Color(0xFFFFFFFF),
     primaryContainer = Color(0xFF00BCD4),
     secondaryContainer = Color(0xFF00E676),
-    surfaceTint = Color(0xFF94A3B8)
+    surfaceTint = Color(0xFFE2E8F0)
 )
 
 

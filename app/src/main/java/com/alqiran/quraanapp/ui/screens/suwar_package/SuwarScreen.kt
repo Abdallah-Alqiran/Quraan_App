@@ -1,14 +1,10 @@
 package com.alqiran.quraanapp.ui.screens.suwar_package
 
 import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -19,10 +15,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startForegroundService
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -31,12 +25,10 @@ import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.Rec
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.suwar.AllSuwar
 import com.alqiran.quraanapp.ui.components.loading_and_failed.FailedLoadingScreen
 import com.alqiran.quraanapp.ui.components.loading_and_failed.LoadingProgressIndicator
-import com.alqiran.quraanapp.R.drawable.ic_play
 import com.alqiran.quraanapp.data.datasources.remote.model.Audio
 import com.alqiran.quraanapp.player.service.AudioService
 import com.alqiran.quraanapp.ui.components.modifiers.surfaceModifier
 import com.alqiran.quraanapp.ui.screens.suwar_package.components.BottomBarPlayer
-import com.alqiran.quraanapp.ui.screens.suwar_package.utils.PlayerIconItem
 import com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.audioViewModel.AudioEvents
 import com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.audioViewModel.AudioViewModel
 import com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.suwarViewModel.SuwarState
@@ -86,7 +78,6 @@ fun SuwarScreen(suwarListAndServer: RecitersMoshafReading, reciterName: String) 
             }
 
             LaunchedEffect(audioList) {
-                Log.e("Al-qiran", "Audio List: $audioList")
                 audioViewModel.setAllAudioData(audioList)
             }
 
@@ -95,6 +86,8 @@ fun SuwarScreen(suwarListAndServer: RecitersMoshafReading, reciterName: String) 
                 allSuwar = (state as SuwarState.Success).allSuwar,
                 reciterName = reciterName,
                 progress = audioViewModel.progress,
+                progressTimer = audioViewModel.progressTimer,
+                duration = audioViewModel.duration,
                 onProgress = { audioViewModel.onAudioEvents(AudioEvents.SeekTo(it)) },
                 isAudioPlaying = audioViewModel.isPlaying,
                 audioList = audioList,
@@ -105,7 +98,6 @@ fun SuwarScreen(suwarListAndServer: RecitersMoshafReading, reciterName: String) 
                 onItemClick = {
                     val surahIndex = it
                     val surahNumber = suwarListNumber[surahIndex].toInt()
-                    Log.d("Al-qiran", "from onItemClick in SuwarScreen: surahNumber: $surahNumber index: $surahIndex the size: ${suwarListNumber.size}")
                     audioViewModel.onAudioEvents(AudioEvents.SelectedAudioChange(surahIndex))
                     if (!isServiceRunning) {
                         val intent = Intent(context, AudioService::class.java)
@@ -130,6 +122,8 @@ fun PrintAllSuwar(
     allSuwar: AllSuwar,
     reciterName: String,
     progress: Float = 0f,
+    progressTimer: Float = 0f,
+    duration: Long = 0L,
     onProgress: (Float) -> Unit,
     isAudioPlaying: Boolean = false,
     audioList: List<Audio>,
@@ -146,7 +140,9 @@ fun PrintAllSuwar(
         bottomBar = {
             BottomBarPlayer(
                 progress = progress,
+                progressTimer = progressTimer,
                 onProgress = onProgress,
+                duration = duration,
                 audio = audioList[audioItem.intValue],
                 isAudioPlaying = isAudioPlaying,
                 onStart = {

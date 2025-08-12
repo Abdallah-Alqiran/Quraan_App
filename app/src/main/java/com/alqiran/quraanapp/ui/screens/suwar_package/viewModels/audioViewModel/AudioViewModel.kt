@@ -2,7 +2,6 @@
 
 package com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.audioViewModel
 
-import android.util.Log
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +39,7 @@ class AudioViewModel @Inject constructor(
 
     var duration by savedStateHandle.saveable { mutableLongStateOf(0L) }
     var progress by savedStateHandle.saveable { mutableFloatStateOf(0f) }
+    var progressTimer by savedStateHandle.saveable { mutableFloatStateOf(0f) }
     var progressString by savedStateHandle.saveable { mutableStateOf("00:00") }
     var isPlaying by savedStateHandle.saveable { mutableStateOf(false) }
     var currentSelectedAudio by savedStateHandle.saveable { mutableStateOf(audioDummy) }
@@ -76,7 +76,6 @@ class AudioViewModel @Inject constructor(
 
     private fun setMediaItems() {
         audioList.map { audio ->
-            Log.i("Al-qiran", "Audio item from viewModel: $audio")
             val audioNumber = audio.surahNumber
             MediaItem.Builder()
                 .setUri("${audio.server}${audioNumber.padStart(3, '0')}.mp3")
@@ -89,33 +88,33 @@ class AudioViewModel @Inject constructor(
                 )
                 .build()
         }.also {
-            Log.i("Al-qiran", "$it")
             audioServiceHandler.setMediaItemList(it)
         }
     }
 
     private fun calculateProgressValue(currentProgress: Long) {
         progress = if (currentProgress > 0) ((currentProgress.toFloat() / duration) * 100f) else 0f
+        progressTimer = if (currentProgress > 0) ((currentProgress.toFloat())) else 0f
         progressString = formatDuration(currentProgress)
     }
 
     private fun formatDuration(duration: Long): String {
-        val minute = TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS)
-        val seconds = (minute) - minute * TimeUnit.SECONDS.convert(1, TimeUnit.MINUTES)
-        return String.format(Locale.getDefault(), "%02d:%02d", minute, seconds)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(duration)
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(duration) % 60
+        return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
     }
-
 
     fun onAudioEvents(audioEvent: AudioEvents) = viewModelScope.launch {
         when (audioEvent) {
             AudioEvents.Backward -> audioServiceHandler.onPlayerEvents(PlayerEvent.Backward)
             AudioEvents.Forward -> audioServiceHandler.onPlayerEvents(PlayerEvent.Forward)
             AudioEvents.PlayPause -> audioServiceHandler.onPlayerEvents(PlayerEvent.PlayPause)
-            is AudioEvents.SeekTo -> audioServiceHandler.onPlayerEvents(
-                playerEvent = PlayerEvent.SeekTo,
-                seekPosition = ((duration * audioEvent.position) / 100f).toLong()
-            )
-
+            is AudioEvents.SeekTo -> {
+                audioServiceHandler.onPlayerEvents(
+                    playerEvent = PlayerEvent.SeekTo,
+                    seekPosition = ((duration * audioEvent.position) / 100f).toLong()
+                )
+            }
             AudioEvents.SeekToNext -> audioServiceHandler.onPlayerEvents(PlayerEvent.SeekToNext)
             AudioEvents.SeekToPrevious -> audioServiceHandler.onPlayerEvents(PlayerEvent.SeekToPrevious)
             is AudioEvents.SelectedAudioChange -> audioServiceHandler.onPlayerEvents(

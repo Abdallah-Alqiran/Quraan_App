@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.alqiran.quraanapp.data.datasources.remote.model.Audio
@@ -23,13 +24,15 @@ import com.alqiran.quraanapp.ui.screens.suwar_package.utils.timeStampToDuration
 @Composable
 fun BottomBarPlayer(
     progress: Float,
+    progressTimer: Float,
+    duration: Long,
     onProgress: (Float) -> Unit,
     audio: Audio,
     isAudioPlaying: Boolean,
     onStart: () -> Unit,
     onNext: () -> Unit,
     onPrevious: () -> Unit
-) { 
+) {
     BottomAppBar(
         modifier = Modifier
             .fillMaxWidth()
@@ -53,7 +56,7 @@ fun BottomBarPlayer(
                 MediaPlayerController(isAudioPlaying, onStart, onNext, onPrevious)
 
                 Text(
-                    text = timeStampToDuration(progress.toLong()),
+                    text = timeStampToDuration((progressTimer).toLong()),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(end = 8.dp)
@@ -61,20 +64,28 @@ fun BottomBarPlayer(
 
                 Slider(
                     value = progress,
-                    onValueChange = {
-                        onProgress(it)
-                    },
+                    onValueChange = { onProgress(it) },
                     valueRange = 0f..100f,
-                    modifier = Modifier.weight(2f),
+                    modifier = Modifier
+                        .weight(2f)
+                        .height(1.dp)
+                        .padding(horizontal = 4.dp),
                     colors = SliderDefaults.colors(
-                        thumbColor = MaterialTheme.colorScheme.primary,
-                        activeTrackColor = MaterialTheme.colorScheme.primary,
-                        inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.24f)
+                        thumbColor = MaterialTheme.colorScheme.primaryContainer,
+                        activeTrackColor = Color.Transparent,
+                        inactiveTrackColor = Color.Transparent,
+                        disabledThumbColor = Color.Transparent,
+                        disabledActiveTrackColor = Color.Transparent,
+                        disabledInactiveTrackColor = Color.Transparent,
+                        disabledInactiveTickColor = Color.Transparent,
+                        disabledActiveTickColor = Color.Transparent,
+                        activeTickColor = MaterialTheme.colorScheme.primaryContainer,
+                        inactiveTickColor = MaterialTheme.colorScheme.primary
                     ),
-                    steps = 0
+                    steps = 99
                 )
                 Text(
-                    text = timeStampToDuration(100L),
+                    text = timeStampToDuration(duration),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(start = 8.dp)
@@ -90,8 +101,10 @@ fun BottomBarPlayer(
 private fun Prev() {
     QuraanAppTheme {
         BottomBarPlayer(
-            progress = 0f,
+            progress = 50f,
+            progressTimer = 0f,
             onProgress = { },
+            duration = 0L,
             audio = Audio(),
             isAudioPlaying = true,
             onStart = {},
