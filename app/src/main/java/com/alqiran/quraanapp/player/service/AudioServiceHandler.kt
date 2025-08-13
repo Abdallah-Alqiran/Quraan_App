@@ -42,52 +42,47 @@ class AudioServiceHandler @Inject constructor(
     ) {
         when (playerEvent) {
             PlayerEvent.Backward -> {
-                Log.d("Al-qiran", "from playerEvent Backward: ${exoPlayer.currentMediaItemIndex} media count: ${exoPlayer.mediaItemCount}")
                 if (exoPlayer.currentMediaItemIndex == 0) {
                     exoPlayer.seekToDefaultPosition(exoPlayer.mediaItemCount - 1)
                 } else {
                     exoPlayer.seekBack()
                 }
             }
+
             PlayerEvent.Forward -> {
-                Log.d("Al-qiran", "from playerEvent Forward: ${exoPlayer.currentMediaItemIndex} media count: ${exoPlayer.mediaItemCount}")
                 if (exoPlayer.currentMediaItemIndex == exoPlayer.mediaItemCount - 1) {
                     exoPlayer.seekToDefaultPosition(0)
                 } else {
                     exoPlayer.seekForward()
                 }
             }
+
             PlayerEvent.SeekToNext -> {
-                Log.d("Al-qiran", "from playerEvent SeekToNext: ${exoPlayer.currentMediaItemIndex} media count: ${exoPlayer.mediaItemCount}")
                 if (exoPlayer.currentMediaItemIndex == exoPlayer.mediaItemCount - 1) {
                     exoPlayer.seekToDefaultPosition(0)
                 } else {
                     exoPlayer.seekToNext()
                 }
             }
+
             PlayerEvent.SeekToPrevious -> {
-                Log.d("Al-qiran", "from playerEvent SeekToPrevious: ${exoPlayer.currentMediaItemIndex} media count: ${exoPlayer.mediaItemCount}")
                 if (exoPlayer.currentMediaItemIndex == 0) {
                     exoPlayer.seekToDefaultPosition(exoPlayer.mediaItemCount - 1)
                 } else {
                     exoPlayer.seekToPrevious()
                 }
             }
+
             PlayerEvent.PlayPause -> playPause()
             PlayerEvent.SeekTo -> exoPlayer.seekTo(seekPosition)
             PlayerEvent.SelectedAudioChange -> {
                 when (selectedAudioIndex) {
                     exoPlayer.currentMediaItemIndex -> {
-                        Log.d("Al-qiran", "from playerEvent Play Pause: $selectedAudioIndex")
                         playPause()
                     }
 
                     else -> {
                         exoPlayer.seekToDefaultPosition(selectedAudioIndex)
-                        Log.d(
-                            "Al-qiran",
-                            "from playerEvent else: $selectedAudioIndex ${exoPlayer.currentMediaItem?.localConfiguration?.uri}"
-                        )
                         _audioState.value = AudioState.Playing(isPlaying = true)
                         exoPlayer.playWhenReady = true
                         startProgressUpdate()
@@ -131,6 +126,11 @@ class AudioServiceHandler @Inject constructor(
             ExoPlayer.STATE_READY -> _audioState.value = AudioState.Ready(exoPlayer.duration)
             else -> {}
         }
+    }
+
+    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+        _audioState.value = AudioState.CurrentPlaying(exoPlayer.currentMediaItemIndex)
+        _audioState.value = AudioState.Ready(exoPlayer.duration)
     }
 
     @OptIn(DelicateCoroutinesApi::class)

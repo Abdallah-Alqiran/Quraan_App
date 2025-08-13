@@ -135,7 +135,6 @@ fun PrintAllSuwar(
     onPrevious: () -> Unit,
 ) {
 
-    val audioItem = remember { mutableIntStateOf(0) }
     Scaffold(
         bottomBar = {
             BottomBarPlayer(
@@ -143,26 +142,15 @@ fun PrintAllSuwar(
                 progressTimer = progressTimer,
                 onProgress = onProgress,
                 duration = duration,
-                audio = audioList[audioItem.intValue],
+                audio = currentPlayingAudio,
                 isAudioPlaying = isAudioPlaying,
                 onStart = {
                     onStart()
                 },
                 onNext = {
-                    if (audioItem.intValue < audioList.size - 1) {
-                        audioItem.intValue += 1
-                    } else {
-                        audioItem.intValue = 0
-                    }
                     onNext()
                 },
                 onPrevious = {
-                    if (audioItem.intValue > 0) {
-                        audioItem.intValue -= 1
-                    }
-                    else {
-                        audioItem.intValue = audioList.size - 1
-                    }
                     onPrevious()
                 }
             )
@@ -180,7 +168,6 @@ fun PrintAllSuwar(
                     modifier = Modifier
                         .surfaceModifier(shape = RoundedCornerShape(8.dp))
                         .clickable {
-                            audioItem.intValue = index
                             onItemClick(index)
                         }
                         .padding(16.dp)
