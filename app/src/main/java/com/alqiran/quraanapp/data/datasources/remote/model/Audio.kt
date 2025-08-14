@@ -5,5 +5,4 @@ data class Audio(
     val server: String = "",
     val surah: String = "",
     val reciter: String = "",
-    val duration: Long = 0
 )

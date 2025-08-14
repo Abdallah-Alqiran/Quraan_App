@@ -1,9 +1,10 @@
 package com.alqiran.quraanapp.ui.screens.reciters_package
 
-import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -21,15 +23,17 @@ import com.alqiran.quraanapp.ui.components.loading_and_failed.LoadingProgressInd
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.Reciter
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.RecitersMoshafReading
 import com.alqiran.quraanapp.ui.components.modifiers.surfaceModifier
+import com.alqiran.quraanapp.ui.components.search.DefaultSearchField
 import com.alqiran.quraanapp.ui.screens.reciters_package.viewModel.RecitersState
 import com.alqiran.quraanapp.ui.screens.reciters_package.viewModel.RecitersViewModel
 
 
 @Composable
-fun RecitersScreen(onReciterClick:(riwayatReciter: List<RecitersMoshafReading>, reciterName: String) -> Unit) {
+fun RecitersScreen(onReciterClick: (riwayatReciter: List<RecitersMoshafReading>, reciterName: String) -> Unit) {
 
     val recitersViewModel = hiltViewModel<RecitersViewModel>()
     val state by recitersViewModel.state.collectAsStateWithLifecycle()
+    val searchText by recitersViewModel.searchText.collectAsState()
 
     LaunchedEffect(Unit) {
         recitersViewModel.fetchReciters()
@@ -40,20 +44,34 @@ fun RecitersScreen(onReciterClick:(riwayatReciter: List<RecitersMoshafReading>, 
             FailedLoadingScreen(errorMessage = (state as RecitersState.Error).message) {
                 recitersViewModel.fetchReciters()
             }
-            Log.d("Al-qiran", (state as RecitersState.Error).message)
         }
 
         RecitersState.Loading -> LoadingProgressIndicator()
         is RecitersState.Success -> {
-            val allRecitersSortedByName = (state as RecitersState.Success).reciters.reciters.sortedBy { it.name }
-            PrintAllReciters(allReciters = allRecitersSortedByName, onReciterClick)
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                DefaultSearchField(
+                    text = searchText,
+                    placeHolder = "ابحث عن الشيخ",
+                    onTextChange = {
+                        recitersViewModel.onSearchTextChange(it)
+                    })
+                val allRecitersSortedByName =
+                    (state as RecitersState.Success).reciters.reciters.sortedBy { it.name }
+                PrintAllReciters(allReciters = allRecitersSortedByName, onReciterClick, recitersViewModel)
+            }
         }
     }
 
 }
 
 @Composable
-fun PrintAllReciters(allReciters: List<Reciter>, onReciterClick:(riwayatReciter: List<RecitersMoshafReading>, reciterName: String) -> Unit) {
+fun PrintAllReciters(
+    allReciters: List<Reciter>,
+    onReciterClick: (riwayatReciter: List<RecitersMoshafReading>, reciterName: String) -> Unit,
+    recitersViewModel: RecitersViewModel
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -65,6 +83,7 @@ fun PrintAllReciters(allReciters: List<Reciter>, onReciterClick:(riwayatReciter:
                     .surfaceModifier()
                     .clickable {
                         onReciterClick(reciter.moshaf, reciter.name)
+                        recitersViewModel.onSearchTextChange("")
                     }
                     .padding(16.dp)
             ) {
@@ -77,31 +96,6 @@ fun PrintAllReciters(allReciters: List<Reciter>, onReciterClick:(riwayatReciter:
                 )
 
             }
-//            Column {
-//                Row {
-//                    Text(
-//                        reciter.id.toString(),
-//                    )
-//                    Text(reciter.name)
-//                }
-//                Text(reciter.letter)
-//                Text(reciter.date)
-//            }
-//            (reciter.moshaf).forEach { mf ->
-//                Column {
-//                    Row {
-//                        Text(
-//                            mf.id.toString(),
-//                        )
-//                        Text(mf.name)
-//                    }
-//                    Text(mf.moshafType.toString())
-//                    Text("Server ${mf.server}")
-//                    Text("surah List: ${mf.surahList}")
-//                    Text("surah Total: ${mf.surahTotal}")
-//
-//                }
-//            }
         }
     }
 }

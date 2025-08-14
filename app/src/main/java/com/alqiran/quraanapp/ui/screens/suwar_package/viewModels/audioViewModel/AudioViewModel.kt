@@ -28,7 +28,7 @@ import javax.inject.Inject
 
 
 private val audioDummy = Audio(
-    surahNumber = "", server = "", surah = "000", reciter = "", duration = 0L
+    surahNumber = "", server = "", surah = "...", reciter = ""
 )
 
 
@@ -47,7 +47,6 @@ class AudioViewModel @Inject constructor(
     var audioList by savedStateHandle.saveable { mutableStateOf(listOf<Audio>()) }
 
     private val _state = MutableStateFlow<AudioUiState>(AudioUiState.Initial)
-    val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -57,9 +56,13 @@ class AudioViewModel @Inject constructor(
                     is AudioState.Buffering -> calculateProgressValue(audioState.progress)
                     is AudioState.Playing -> isPlaying = audioState.isPlaying
                     is AudioState.Progress -> calculateProgressValue(audioState.progress)
-                    is AudioState.CurrentPlaying -> currentSelectedAudio =
-                        audioList[audioState.mediaItemIndex]
+                    is AudioState.CurrentPlaying -> {
+                        try {
+                            currentSelectedAudio = audioList[audioState.mediaItemIndex]
+                        } catch (e: Exception) {
 
+                        }
+                    }
                     is AudioState.Ready -> {
                         duration = audioState.duration
                         _state.value = AudioUiState.Ready
