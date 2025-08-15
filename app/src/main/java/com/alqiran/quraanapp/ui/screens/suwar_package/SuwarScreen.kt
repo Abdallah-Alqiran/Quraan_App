@@ -27,7 +27,7 @@ import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.Rec
 import com.alqiran.quraanapp.ui.components.loading_and_failed.FailedLoadingScreen
 import com.alqiran.quraanapp.ui.components.loading_and_failed.LoadingProgressIndicator
 import com.alqiran.quraanapp.data.datasources.remote.model.Audio
-import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.suwar.SuwarExist
+import com.alqiran.quraanapp.ui.screens.suwar_package.model.SuwarExist
 import com.alqiran.quraanapp.player.service.AudioService
 import com.alqiran.quraanapp.ui.components.modifiers.surfaceModifier
 import com.alqiran.quraanapp.ui.components.search.DefaultSearchField

@@ -1,11 +1,8 @@
 package com.alqiran.quraanapp
 
 import android.app.Application
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
-import android.os.Build
 import com.alqiran.quraanapp.ui.utils.NotificationConstants.CHANNEL_ID
 import com.alqiran.quraanapp.ui.utils.NotificationConstants.CHANNEL_NAME
 import dagger.hilt.android.HiltAndroidApp

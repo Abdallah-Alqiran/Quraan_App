@@ -61,7 +61,6 @@ fun QuraanAppTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }

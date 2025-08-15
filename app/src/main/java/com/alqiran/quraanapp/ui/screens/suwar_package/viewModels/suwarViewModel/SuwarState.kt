@@ -1,7 +1,6 @@
 package com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.suwarViewModel
 
-import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.suwar.AllSuwar
-import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.suwar.SuwarExist
+import com.alqiran.quraanapp.ui.screens.suwar_package.model.SuwarExist
 
 sealed class SuwarState {
     data object Loading: SuwarState()

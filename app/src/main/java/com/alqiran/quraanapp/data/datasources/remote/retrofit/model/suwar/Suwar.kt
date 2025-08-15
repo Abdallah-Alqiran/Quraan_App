@@ -12,9 +12,3 @@ data class Suwar(
     val startPage: Int,
     val type: Int
 )
-
-data class SuwarExist(
-    val id: Int,
-    val surahNumber: Int,
-    val name: String,
-)

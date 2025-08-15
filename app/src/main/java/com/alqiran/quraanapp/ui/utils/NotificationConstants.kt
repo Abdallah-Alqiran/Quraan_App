@@ -7,8 +7,4 @@ object NotificationConstants {
 
     const val NOTIFICATION_CHANNEL_ID = "audio_player_channel"
     const val NOTIFICATION_CHANNEL_NAME = "Audio Player"
-
-    const val PREV = "prev"
-    const val NEXT = "next"
-    const val PLAY_PAUSE = "play_pause"
 }

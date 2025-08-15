@@ -2,7 +2,6 @@
 
 package com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.audioViewModel
 
-import android.util.Log
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -19,7 +18,6 @@ import com.alqiran.quraanapp.player.service.AudioState
 import com.alqiran.quraanapp.player.service.PlayerEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -59,9 +57,7 @@ class AudioViewModel @Inject constructor(
                     is AudioState.CurrentPlaying -> {
                         try {
                             currentSelectedAudio = audioList[audioState.mediaItemIndex]
-                        } catch (e: Exception) {
-
-                        }
+                        } catch (_: Exception) { }
                     }
                     is AudioState.Ready -> {
                         duration = audioState.duration

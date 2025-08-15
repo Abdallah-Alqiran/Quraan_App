@@ -3,7 +3,7 @@ package com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.suwarViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.RecitersMoshafReading
-import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.suwar.SuwarExist
+import com.alqiran.quraanapp.ui.screens.suwar_package.model.SuwarExist
 import com.alqiran.quraanapp.ui.utils.surahIdToNameMap
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +40,7 @@ class SuwarViewModel() : ViewModel() {
 
         val surahNumber: List<Int> =
             _recitersMoshafReading.value?.surahList?.split(",")?.map { it.toInt() } ?: emptyList()
-        var counter = 0;
+        var counter = 0
 
         val list: List<SuwarExist> = surahNumber.map { number ->
             SuwarExist(

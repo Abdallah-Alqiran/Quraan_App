@@ -1,6 +1,5 @@
 package com.alqiran.quraanapp.ui.screens.suwar_package.utils
 
-import android.util.Log
 import kotlin.math.floor
 
 fun timeStampToDuration(position: Long): String {
