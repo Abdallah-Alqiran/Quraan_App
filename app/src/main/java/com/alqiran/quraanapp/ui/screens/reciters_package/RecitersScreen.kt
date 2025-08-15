@@ -35,10 +35,6 @@ fun RecitersScreen(onReciterClick: (riwayatReciter: List<RecitersMoshafReading>,
     val state by recitersViewModel.state.collectAsStateWithLifecycle()
     val searchText by recitersViewModel.searchText.collectAsState()
 
-    LaunchedEffect(Unit) {
-        recitersViewModel.fetchReciters()
-    }
-
     when (state) {
         is RecitersState.Error -> {
             FailedLoadingScreen(errorMessage = (state as RecitersState.Error).message) {

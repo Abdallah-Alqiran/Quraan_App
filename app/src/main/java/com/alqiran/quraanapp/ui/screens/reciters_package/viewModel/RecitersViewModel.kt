@@ -24,6 +24,10 @@ class RecitersViewModel @Inject constructor(
 
     private var _allReciters = AllReciters(emptyList())
 
+    init {
+        fetchReciters()
+    }
+
     fun fetchReciters() {
         _state.value = RecitersState.Loading
 

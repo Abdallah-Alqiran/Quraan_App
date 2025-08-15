@@ -1,7 +1,6 @@
 package com.alqiran.quraanapp.ui.screens.suwar_package
 
 import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,11 +22,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startForegroundService
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.reciters.RecitersMoshafReading
-import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.suwar.AllSuwar
 import com.alqiran.quraanapp.ui.components.loading_and_failed.FailedLoadingScreen
 import com.alqiran.quraanapp.ui.components.loading_and_failed.LoadingProgressIndicator
 import com.alqiran.quraanapp.data.datasources.remote.model.Audio
+import com.alqiran.quraanapp.data.datasources.remote.retrofit.model.suwar.SuwarExist
 import com.alqiran.quraanapp.player.service.AudioService
 import com.alqiran.quraanapp.ui.components.modifiers.surfaceModifier
 import com.alqiran.quraanapp.ui.components.search.DefaultSearchField
@@ -36,29 +36,27 @@ import com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.audioViewModel.
 import com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.audioViewModel.AudioViewModel
 import com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.suwarViewModel.SuwarState
 import com.alqiran.quraanapp.ui.screens.suwar_package.viewModels.suwarViewModel.SuwarViewModel
-import com.alqiran.quraanapp.ui.utils.surahNameToIdMap
 
 
 @Composable
 fun SuwarScreen(suwarListAndServer: RecitersMoshafReading, reciterName: String) {
 
-    val suwarViewModel = hiltViewModel<SuwarViewModel>()
+    val suwarViewModel = viewModel<SuwarViewModel>()
     val audioViewModel = hiltViewModel<AudioViewModel>()
     val state by suwarViewModel.state.collectAsStateWithLifecycle()
     val searchText by suwarViewModel.searchText.collectAsState()
+
+    LaunchedEffect(suwarListAndServer) {
+        suwarViewModel.setRecitersMoshafReading(suwarListAndServer)
+    }
 
     var isServiceRunning = false
 
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        suwarViewModel.fetchSuwar()
-    }
-
     when (state) {
         is SuwarState.Error -> {
             FailedLoadingScreen((state as SuwarState.Error).message) {
-                suwarViewModel.fetchSuwar()
             }
         }
 
@@ -66,22 +64,26 @@ fun SuwarScreen(suwarListAndServer: RecitersMoshafReading, reciterName: String) 
             LoadingProgressIndicator()
         }
 
-        is SuwarState.Success -> {
-            val suwar = (state as SuwarState.Success).allSuwar.suwar
+        is SuwarState.SuccessFetching -> {
+            LoadingProgressIndicator()
 
-            LaunchedEffect(Unit) {
-                val audioList =
-                    suwar.map { surah ->
-                        Audio(
-                            surahNumber = surahNameToIdMap[surah.name].toString(),
-                            server = suwarListAndServer.server,
-                            surah = surah.name,
-                            reciter = reciterName,
-                        )
-                    }
-                Log.d("Al-qiran", "$audioList")
-                audioViewModel.setAllAudioData(audioList)
-            }
+            val suwarList = (state as SuwarState.SuccessFetching).suwarExist
+
+            val audioList =
+                suwarList.map { surah ->
+                    Audio(
+                        surahNumber = surah.surahNumber.toString(),
+                        server = suwarListAndServer.server,
+                        surah = surah.name,
+                        reciter = reciterName,
+                    )
+                }
+            audioViewModel.setAllAudioData(audioList)
+        }
+
+        is SuwarState.Success -> {
+
+            val suwarList = (state as SuwarState.Success).suwarExist
 
             Column(
                 modifier = Modifier.fillMaxWidth()
@@ -93,7 +95,7 @@ fun SuwarScreen(suwarListAndServer: RecitersMoshafReading, reciterName: String) 
                         suwarViewModel.onSearchTextChange(it)
                     })
                 PrintAllSuwar(
-                    allSuwar = (state as SuwarState.Success).allSuwar,
+                    allSuwar = suwarList,
                     progress = audioViewModel.progress,
                     progressTimer = audioViewModel.progressTimer,
                     duration = audioViewModel.duration,
@@ -104,8 +106,7 @@ fun SuwarScreen(suwarListAndServer: RecitersMoshafReading, reciterName: String) 
                         audioViewModel.onAudioEvents(AudioEvents.PlayPause)
                     },
                     onItemClick = {
-                        val surahIndex = it
-                        audioViewModel.onAudioEvents(AudioEvents.SelectedAudioChange(surahIndex))
+                        audioViewModel.onAudioEvents(AudioEvents.SelectedAudioChange(it))
                         if (!isServiceRunning) {
                             val intent = Intent(context, AudioService::class.java)
                             startForegroundService(context, intent)
@@ -127,7 +128,7 @@ fun SuwarScreen(suwarListAndServer: RecitersMoshafReading, reciterName: String) 
 
 @Composable
 fun PrintAllSuwar(
-    allSuwar: AllSuwar,
+    allSuwar: List<SuwarExist>,
     progress: Float = 0f,
     progressTimer: Float = 0f,
     duration: Long = 0L,
@@ -167,19 +168,18 @@ fun PrintAllSuwar(
                 .padding(16.dp),
             contentPadding = it
         ) {
-            val suwarList = allSuwar.suwar
-            items(suwarList) { surah ->
+            items(allSuwar) { surah ->
                 Column(
                     modifier = Modifier
                         .surfaceModifier(shape = RoundedCornerShape(8.dp))
                         .clickable {
-                            onItemClick((surahNameToIdMap[surah.name] ?: 0) - 1)
+                            onItemClick(surah.id)
                         }
                         .padding(16.dp)
 
                 ) {
                     Text(
-                        text = "${surahNameToIdMap[surah.name]} - سورة ${surah.name}",
+                        text = "${surah.surahNumber} - سورة ${surah.name}",
                         color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier

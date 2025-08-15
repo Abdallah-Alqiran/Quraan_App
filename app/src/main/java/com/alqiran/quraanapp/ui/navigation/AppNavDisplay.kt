@@ -1,5 +1,6 @@
 package com.alqiran.quraanapp.ui.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
@@ -11,8 +12,11 @@ import com.alqiran.quraanapp.ui.screens.riwayat_package.RiwayatScreen
 import com.alqiran.quraanapp.ui.screens.suwar_package.SuwarScreen
 
 @Composable
-fun AppNavDisplay(modifier: Modifier = Modifier, backStack: NavBackStack,screenWithValue: MutableState<Pair<String, String>>) {
-
+fun AppNavDisplay(
+    modifier: Modifier = Modifier,
+    backStack: NavBackStack,
+    screenWithValue: MutableState<Pair<String, String>>
+) {
 
     NavDisplay(
         backStack = backStack,
@@ -37,6 +41,7 @@ fun AppNavDisplay(modifier: Modifier = Modifier, backStack: NavBackStack,screenW
                             riwayatReciter = key.riwayatReciter,
                             reciterName = key.reciterName
                         ) {
+                            Log.i("Al-qiran", it.toString())
                             backStack.add(SuwarScreenRoute(suwar = it, key.reciterName))
                         }
                     }
@@ -49,6 +54,7 @@ fun AppNavDisplay(modifier: Modifier = Modifier, backStack: NavBackStack,screenW
                         SuwarScreen(key.suwar, key.reciterName)
                     }
                 }
+
                 else -> throw RuntimeException("Invalid NavKey")
             }
         }
