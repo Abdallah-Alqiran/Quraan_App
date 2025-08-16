@@ -4,6 +4,7 @@ plugins {
 
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
+    id("kotlin-parcelize")
 
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.compose)
@@ -136,5 +137,7 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer.dash)
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.media3.ui.compose)
+
+    implementation(libs.androidx.legacy.support.v4)
 
 }

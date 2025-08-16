@@ -46,7 +46,6 @@ class AudioNotificationManager @Inject constructor(
         mediaSessionService.startForeground(NOTIFICATION_ID, notification)
     }
 
-
     @OptIn(UnstableApi::class)
     private fun buildNotification(mediaSession: MediaSession) {
         PlayerNotificationManager.Builder(
@@ -55,14 +54,13 @@ class AudioNotificationManager @Inject constructor(
             NOTIFICATION_CHANNEL_ID
         )
             .setMediaDescriptionAdapter(AudioNotificationAdapter(mediaSession.sessionActivity))
-            .setSmallIconResourceId(R.drawable.ic_launcher_foreground)
+            .setSmallIconResourceId(R.drawable.app_logo)
             .build()
             .also {
-//                it.setMediaSessionToken(mediaSession.sessionCompatToken)
                 it.setUseFastForwardActionInCompactView(true)
                 it.setUseRewindActionInCompactView(true)
                 it.setUseNextActionInCompactView(true)
-                it.setPriority(NotificationCompat.PRIORITY_LOW)
+                it.setPriority(NotificationCompat.PRIORITY_HIGH)
                 it.setPlayer(exoPlayer)
             }
     }
@@ -70,7 +68,7 @@ class AudioNotificationManager @Inject constructor(
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,
             NOTIFICATION_CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_LOW
+            NotificationManager.IMPORTANCE_HIGH
         )
         notificationManager.createNotificationChannel(channel)
     }
